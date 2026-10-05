@@ -4,29 +4,6 @@ import 'package:flutter/material.dart';
 const String studentName = 'I Ketut Bagus Brihaspati';
 const String studentId = '2415051090';
 
-// Model Data Course
-class Course {
-  final String title;
-  final String category;
-  final String level;
-
-  const Course({
-    required this.title,
-    required this.category,
-    required this.level,
-  });
-}
-
-// Data Dummy Course
-const List<Course> dummyCourses = [
-  Course(title: 'Pemrograman Flutter', category: 'Mobile', level: 'Beginner'),
-  Course(title: 'Pengembangan Web Laravel', category: 'Web', level: 'Intermediate'),
-  Course(title: 'Jaringan Komputer', category: 'Network', level: 'Advanced'),
-  Course(title: 'Pengolahan Citra Digital', category: 'Multimedia', level: 'Intermediate'),
-  Course(title: 'Kecerdasan Buatan', category: 'AI', level: 'Advanced'),
-  Course(title: 'Desain UI/UX', category: 'Design', level: 'Beginner'),
-];
-
 void main() {
   runApp(const MyApp());
 }
@@ -37,132 +14,112 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Tahap 5 - GridView Responsif',
+      title: 'Tahap 6 - Scrollable Content & Keyboard',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const Tahap5Screen(),
+      home: const Tahap6Screen(),
     );
   }
 }
 
-class Tahap5Screen extends StatelessWidget {
-  const Tahap5Screen({super.key});
-
-  // Fungsi penentu jumlah kolom berdasarkan lebar layar (Sesuai Modul)
-  int columnsFor(double width) {
-    if (width < 600) return 1;
-    if (width < 840) return 2;
-    return 3;
-  }
+class Tahap6Screen extends StatelessWidget {
+  const Tahap6Screen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tahap 5 - GridView Responsif'),
+        title: const Text('Tahap 6 - Scrollable Form'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header Identitas Mahasiswa (Tetap Terlihat)
-                Card(
-                  elevation: 2,
-                  color: Theme.of(context).colorScheme.surfaceVariant,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.person, size: 32),
-                        const SizedBox(width: 12),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Mahasiswa: $studentName',
-                              style: const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            Text('NIM: $studentId'),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // GridView Responsif
-                Expanded(
-                  child: GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: columnsFor(constraints.maxWidth),
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                      childAspectRatio: 2.2,
-                    ),
-                    itemCount: dummyCourses.length,
-                    itemBuilder: (context, index) {
-                      return CourseCard(course: dummyCourses[index]);
-                    },
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-// Widget Card untuk Course
-class CourseCard extends StatelessWidget {
-  final Course course;
-
-  const CourseCard({super.key, required this.course});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
+      // Menerapkan SingleChildScrollView sesuai instruksi modul
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            // Identitas Mahasiswa
             Text(
-              course.title,
+              '$studentId - $studentName',
               style: const TextStyle(
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
-                fontSize: 14,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 6),
-            Row(
-              children: [
-                Chip(
-                  label: Text(
-                    course.category,
-                    style: const TextStyle(fontSize: 10),
-                  ),
-                  visualDensity: VisualDensity.compact,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  course.level,
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
-                ),
-              ],
+            const Divider(height: 24),
+
+            // Form Sederhana yang Lebih Tinggi dari Layar
+            const Text(
+              'Form Profil Mahasiswa',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+
+            const TextField(
+              decoration: InputDecoration(
+                labelText: 'Nama Lengkap',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.person),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            const TextField(
+              decoration: InputDecoration(
+                labelText: 'NIM',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.badge),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            const TextField(
+              decoration: InputDecoration(
+                labelText: 'Email',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.email),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            const TextField(
+              decoration: InputDecoration(
+                labelText: 'Program Studi',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.school),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            const TextField(
+              maxLines: 3,
+              decoration: InputDecoration(
+                labelText: 'Alamat / Bio',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.home),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            const TextField(
+              decoration: InputDecoration(
+                labelText: 'Catatan Tambahan',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.note),
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton(
+                onPressed: () {},
+                child: const Text('Simpan Profil'),
+              ),
             ),
           ],
         ),
