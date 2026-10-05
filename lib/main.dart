@@ -42,7 +42,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Tahap 8 - Passing Data to Detail',
+      title: 'Tahap 9 - Returning Data from Screen',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
@@ -53,7 +53,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// 1. HomePage - Menampilkan List Course
+// 1. HomePage - Menunggu Nilai Kembalian dari Detail Screen
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
@@ -110,14 +110,27 @@ class HomePage extends StatelessWidget {
               ),
               subtitle: Text('Kode: ${course['code']} | Status: ${course['status']}'),
               trailing: const Icon(Icons.chevron_right),
-              onTap: () {
-                // Passing Map course ke CourseDetailPage
-                Navigator.push(
+              onTap: () async {
+                // Poin 35 & 37: Menggunakan await untuk menerima hasil dari CourseDetailPage
+                final result = await Navigator.push<bool>(
                   context,
                   MaterialPageRoute(
                     builder: (_) => CourseDetailPage(course: course),
                   ),
                 );
+
+                // Jika result bernilai true, tampilkan SnackBar
+                if (result == true && context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Mata kuliah "${course['title']}" berhasil ditambahkan ke Favorit oleh $studentName!',
+                      ),
+                      backgroundColor: Colors.green,
+                      duration: const Duration(seconds: 3),
+                    ),
+                  );
+                }
               },
             ),
           );
@@ -127,7 +140,7 @@ class HomePage extends StatelessWidget {
   }
 }
 
-// 2. CourseDetailPage - Menerima Data Course via Constructor
+// 2. CourseDetailPage - Mengembalikan Nilai ke Screen Sebelumnya
 class CourseDetailPage extends StatelessWidget {
   final Map<String, dynamic> course;
 
@@ -202,7 +215,7 @@ class CourseDetailPage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // Identitas Mahasiswa pada Halaman Detail (Sesuai Poin 34)
+            // Identitas Mahasiswa
             Container(
               padding: const EdgeInsets.all(12.0),
               decoration: BoxDecoration(
@@ -226,13 +239,32 @@ class CourseDetailPage extends StatelessWidget {
             ),
             const Spacer(),
 
-            // Tombol Kembali
+            // Poin 35 & 36: Tombol 'Pilih/Favorite' yang mengembalikan nilai true
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  // Kembali ke screen sebelumnya sambil membawa nilai true
+                  Navigator.pop(context, true);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurple,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+                icon: const Icon(Icons.favorite),
+                label: const Text('Pilih / Favoritkan Mata Kuliah'),
+              ),
+            ),
+            const SizedBox(height: 10),
+
+            // Tombol Batal / Kembali tanpa mengirimkan data
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () => Navigator.pop(context, false),
                 icon: const Icon(Icons.arrow_back),
-                label: const Text('Kembali ke Daftar Mata Kuliah'),
+                label: const Text('Batal'),
               ),
             ),
           ],
