@@ -14,95 +14,110 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Tahap 3 - LayoutBuilder & Breakpoint',
+      title: 'Tahap 4 - Expanded, Flexible, & Wrap',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Tahap 3 - LayoutBuilder'),
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        ),
-        body: LayoutBuilder(
-          builder: (context, constraints) {
-            // Breakpoint sesuai panduan praktikum
-            if (constraints.maxWidth < 600) {
-              return const CompactLayout();
-            } else if (constraints.maxWidth < 840) {
-              return const MediumLayout();
-            } else {
-              return const ExpandedLayout();
-            }
-          },
-        ),
-      ),
+      home: const Tahap4Screen(),
     );
   }
 }
 
-// Widget Layout Compact (< 600)
-class CompactLayout extends StatelessWidget {
-  const CompactLayout({super.key});
+class Tahap4Screen extends StatelessWidget {
+  const Tahap4Screen({super.key});
 
-  @override
-  Widget build(BuildContext context) {
+  // Daftar minimal 6 chip skill
+  final List<String> skills = const [
+    'Flutter',
+    'Dart',
+    'UI/UX Design',
+    'HTML/CSS',
+    'JavaScript',
+    'Git & GitHub',
+    'REST API',
+  ];
+
+  // Helper method untuk membuat box panel
+  Widget buildBox(String label, Color color) {
     return Container(
-      color: Colors.red.shade50,
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          Text(
-            'Mahasiswa: $studentName ($studentId)',
-            style: TextStyle(fontWeight: FontWeight.bold),
+      padding: const EdgeInsets.all(16),
+      color: color,
+      child: Center(
+        child: Text(
+          label,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
           ),
-          SizedBox(height: 12),
-          Card(
-            color: Colors.redAccent,
-            child: Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text(
-                'Kategori: Compact (< 600)\nVisual: Tampilan vertikal satu kolom (Mobile)',
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
-}
-
-// Widget Layout Medium (600 - 839)
-class MediumLayout extends StatelessWidget {
-  const MediumLayout({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.orange.shade50,
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          Text(
-            'Mahasiswa: $studentName ($studentId)',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 12),
-          Card(
-            color: Colors.orangeAccent,
-            child: Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text(
-                'Kategori: Medium (600–839)\nVisual: Tampilan sedang dengan latar oranye (Tablet)',
-                style: TextStyle(color: Colors.white),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Tahap 4 - Expanded & Wrap'),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Informasi Identitas Mahasiswa
+            Text(
+              'Mahasiswa: $studentName ($studentId)',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
               ),
             ),
-          ),
-        ],
+            const Divider(height: 24),
+
+            // Section 1: Row dengan Expanded flex 2:1
+            const Text(
+              '1. Row dengan Expanded (Flex 2 : 1):',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: buildBox('Panel A (Flex 2)', Colors.deepPurple),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  flex: 1,
+                  child: buildBox('Panel B (Flex 1)', Colors.deepPurpleAccent),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 24),
+
+            // Section 2: Chip Skill Menggunakan Wrap
+            const Text(
+              '2. List Skill Menggunakan Wrap:',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: skills
+                  .map((e) => Chip(
+                        label: Text(e),
+                        backgroundColor: Colors.deepPurple.shade50,
+                      ))
+                  .toList(),
+            ),
+          ],
+        ),
       ),
     );
   }
