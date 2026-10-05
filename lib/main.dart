@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-// Variabel Identitas Mahasiswa
+// Variabel Identitas Mahasiswa (Wajib)
 const String studentName = 'I Ketut Bagus Brihaspati';
 const String studentId = '2415051090';
 
@@ -14,65 +14,128 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Tahap 2 - MediaQuery',
+      title: 'Tahap 3 - LayoutBuilder & Breakpoint',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const Tahap2Screen(),
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Tahap 3 - LayoutBuilder'),
+          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        ),
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            // Breakpoint sesuai panduan praktikum
+            if (constraints.maxWidth < 600) {
+              return const CompactLayout();
+            } else if (constraints.maxWidth < 840) {
+              return const MediumLayout();
+            } else {
+              return const ExpandedLayout();
+            }
+          },
+        ),
+      ),
     );
   }
 }
 
-class Tahap2Screen extends StatelessWidget {
-  const Tahap2Screen({super.key});
+// Widget Layout Compact (< 600)
+class CompactLayout extends StatelessWidget {
+  const CompactLayout({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // 1. Membaca properti MediaQuery
-    final size = MediaQuery.of(context).size;
-    final orientation = MediaQuery.of(context).orientation;
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Tahap 2 - MediaQuery'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+    return Container(
+      color: Colors.red.shade50,
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const [
+          Text(
+            'Mahasiswa: $studentName ($studentId)',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 12),
+          Card(
+            color: Colors.redAccent,
+            child: Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Text(
+                'Kategori: Compact (< 600)\nVisual: Tampilan vertikal satu kolom (Mobile)',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ),
+        ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Menampilkan Identitas Mahasiswa (Nama & NIM)
-            Text(
-              'Mahasiswa: $studentName ($studentId)',
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+    );
+  }
+}
+
+// Widget Layout Medium (600 - 839)
+class MediumLayout extends StatelessWidget {
+  const MediumLayout({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.orange.shade50,
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const [
+          Text(
+            'Mahasiswa: $studentName ($studentId)',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 12),
+          Card(
+            color: Colors.orangeAccent,
+            child: Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Text(
+                'Kategori: Medium (600–839)\nVisual: Tampilan sedang dengan latar oranye (Tablet)',
+                style: TextStyle(color: Colors.white),
               ),
             ),
-            const Divider(height: 24),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
-            // Menampilkan data MediaQuery sesuai format modul
-            Text('Width: ${size.width.toStringAsFixed(0)}'),
-            const SizedBox(height: 8),
-            Text('Height: ${size.height.toStringAsFixed(0)}'),
-            const SizedBox(height: 8),
-            Text('Orientation: $orientation'),
-            const SizedBox(height: 16),
+// Widget Layout Expanded (>= 840)
+class ExpandedLayout extends StatelessWidget {
+  const ExpandedLayout({super.key});
 
-            // Kondisi sederhana: width < 600 ? 'Compact' : 'Wide'
-            Text(
-              'Layout Mode: ${size.width < 600 ? 'Compact' : 'Wide'}',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: size.width < 600 ? Colors.orange : Colors.green,
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.green.shade50,
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const [
+          Text(
+            'Mahasiswa: $studentName ($studentId)',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 12),
+          Card(
+            color: Colors.green,
+            child: Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Text(
+                'Kategori: Expanded (>= 840)\nVisual: Tampilan lebar dengan latar hijau (Desktop / Web)',
+                style: TextStyle(color: Colors.white),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
