@@ -14,56 +14,70 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Tahap 1 - Responsive Problem',
+      title: 'Tahap 2 - MediaQuery',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Tahap 1 - Hardcoded Layout'),
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Card(
-                color: Colors.amber.shade100,
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Container(
-                    width: 500, // Ukuran statis (hard-coded)
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Mahasiswa: $studentName ($studentId)',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        const Text(
-                          'Container ini memiliki lebar statis (width: 500px).\n',
-                          style: TextStyle(fontSize: 14),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+      home: const Tahap2Screen(),
+    );
+  }
+}
+
+class Tahap2Screen extends StatelessWidget {
+  const Tahap2Screen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // 1. Membaca properti MediaQuery
+    final size = MediaQuery.of(context).size;
+    final orientation = MediaQuery.of(context).orientation;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Tahap 2 - MediaQuery'),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Menampilkan Identitas Mahasiswa (Nama & NIM)
+            Text(
+              'Mahasiswa: $studentName ($studentId)',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
               ),
-            ],
-          ),
+            ),
+            const Divider(height: 24),
+
+            // Menampilkan data MediaQuery sesuai format modul
+            Text('Width: ${size.width.toStringAsFixed(0)}'),
+            const SizedBox(height: 8),
+            Text('Height: ${size.height.toStringAsFixed(0)}'),
+            const SizedBox(height: 8),
+            Text('Orientation: $orientation'),
+            const SizedBox(height: 16),
+
+            // Kondisi sederhana: width < 600 ? 'Compact' : 'Wide'
+            Text(
+              'Layout Mode: ${size.width < 600 ? 'Compact' : 'Wide'}',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: size.width < 600 ? Colors.orange : Colors.green,
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
+
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
 
