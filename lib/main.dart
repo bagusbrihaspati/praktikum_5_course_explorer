@@ -14,112 +14,117 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Tahap 6 - Scrollable Content & Keyboard',
+      title: 'Tahap 7 - Navigation Push & Pop',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const Tahap6Screen(),
+      home: const HomePage(),
     );
   }
 }
 
-class Tahap6Screen extends StatelessWidget {
-  const Tahap6Screen({super.key});
+// 1. HomePage
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tahap 6 - Scrollable Form'),
+        title: const Text('Home Page'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
-      // Menerapkan SingleChildScrollView sesuai instruksi modul
-      body: SingleChildScrollView(
+      body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Identitas Mahasiswa
-            Text(
-              '$studentId - $studentName',
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const Divider(height: 24),
-
-            // Form Sederhana yang Lebih Tinggi dari Layar
-            const Text(
-              'Form Profil Mahasiswa',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-
-            const TextField(
-              decoration: InputDecoration(
-                labelText: 'Nama Lengkap',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.person),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            const TextField(
-              decoration: InputDecoration(
-                labelText: 'NIM',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.badge),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            const TextField(
-              decoration: InputDecoration(
-                labelText: 'Email',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.email),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            const TextField(
-              decoration: InputDecoration(
-                labelText: 'Program Studi',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.school),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            const TextField(
-              maxLines: 3,
-              decoration: InputDecoration(
-                labelText: 'Alamat / Bio',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.home),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            const TextField(
-              decoration: InputDecoration(
-                labelText: 'Catatan Tambahan',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.note),
+            Card(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  children: [
+                    const Icon(Icons.person, size: 32),
+                    const SizedBox(width: 12),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        Text(
+                          'Mahasiswa: $studentName',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Text('NIM: $studentId'),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 24),
 
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton(
-                onPressed: () {},
-                child: const Text('Simpan Profil'),
+            // Tombol Navigasi ke DetailPage
+            ElevatedButton.icon(
+              onPressed: () {
+                // Menggunakan Navigator.push() untuk berpindah ke DetailPage
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const DetailPage(),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.arrow_forward),
+              label: const Text('Buka Detail'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// 2. DetailPage
+class DetailPage extends StatelessWidget {
+  const DetailPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Detail Page'),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Identitas Mahasiswa tetap ditampilkan
+            Text(
+              'Detail untuk: $studentName ($studentId)',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
               ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Hallo bagus',
+            ),
+            const SizedBox(height: 24),
+
+            // Tombol Kembali Kustom
+            OutlinedButton.icon(
+              onPressed: () {
+                // Menggunakan Navigator.pop() untuk kembali ke HomePage
+                Navigator.pop(context);
+              },
+              icon: const Icon(Icons.arrow_back),
+              label: const Text('Kembali (Pop)'),
             ),
           ],
         ),
