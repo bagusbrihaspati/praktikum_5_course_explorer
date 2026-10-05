@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-// Variabel Identitas Mahasiswa (Wajib)
+// Variabel Identitas Mahasiswa
 const String studentName = 'I Ketut Bagus Brihaspati';
 const String studentId = '2415051090';
 
@@ -11,24 +11,59 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Course Explorer',
+      title: 'Tahap 1 - Responsive Problem',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const Scaffold(
-        body: Center(
-          child: Text('Selamat Datang $studentName ($studentId)'),
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Tahap 1 - Hardcoded Layout'),
+          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Card(
+                color: Colors.amber.shade100,
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Container(
+                    width: 500, // Ukuran statis (hard-coded)
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Mahasiswa: $studentName ($studentId)',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        const Text(
+                          'Container ini memiliki lebar statis (width: 500px).\n',
+                          style: TextStyle(fontSize: 14),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
-
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
 
