@@ -42,7 +42,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Tahap 10 - NavigationBar',
+      title: 'Tahap 11 - Adaptive Navigation',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
@@ -53,7 +53,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// Poin 40: StatefulWidget untuk mengelola selectedIndex navigasi utama
+// Shell utama aplikasi dengan Adaptive Navigation Pattern
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
 
@@ -62,9 +62,9 @@ class MainNavigationScreen extends StatefulWidget {
 }
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
+  // Poin 46: selectedIndex disimpan di level State agar tidak reset saat layout berubah
   int _selectedIndex = 0;
 
-  // Poin 41: Daftar widget/halaman yang ditampilkan sesuai index
   late final List<Widget> _pages;
 
   @override
@@ -79,39 +79,85 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _pages[_selectedIndex],
-      // Poin 39 & 40: NavigationBar Material 3
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _selectedIndex,
-        onDestinationSelected: (int index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.school_outlined),
-            selectedIcon: Icon(Icons.school),
-            label: 'Courses',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-      ),
+    // Poin 43: Gunakan LayoutBuilder pada shell aplikasi
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Breakpoint 840px untuk membedakan Compact vs Expanded
+        if (constraints.maxWidth < 840) {
+          // Poin 44: Compact Layout menggunakan NavigationBar (Bottom)
+          return Scaffold(
+            body: _pages[_selectedIndex],
+            bottomNavigationBar: NavigationBar(
+              selectedIndex: _selectedIndex,
+              onDestinationSelected: (int index) {
+                setState(() {
+                  _selectedIndex = index;
+                });
+              },
+              destinations: const [
+                NavigationDestination(
+                  icon: Icon(Icons.home_outlined),
+                  selectedIcon: Icon(Icons.home),
+                  label: 'Home',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.school_outlined),
+                  selectedIcon: Icon(Icons.school),
+                  label: 'Courses',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.person_outline),
+                  selectedIcon: Icon(Icons.person),
+                  label: 'Profile',
+                ),
+              ],
+            ),
+          );
+        } else {
+          // Poin 45: Expanded Layout menggunakan NavigationRail (Side)
+          return Scaffold(
+            body: Row(
+              children: [
+                NavigationRail(
+                  selectedIndex: _selectedIndex,
+                  onDestinationSelected: (int index) {
+                    setState(() {
+                      _selectedIndex = index;
+                    });
+                  },
+                  labelType: NavigationRailLabelType.all,
+                  destinations: const [
+                    NavigationRailDestination(
+                      icon: Icon(Icons.home_outlined),
+                      selectedIcon: Icon(Icons.home),
+                      label: Text('Home'),
+                    ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.school_outlined),
+                      selectedIcon: Icon(Icons.school),
+                      label: Text('Courses'),
+                    ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.person_outline),
+                      selectedIcon: Icon(Icons.person),
+                      label: Text('Profile'),
+                    ),
+                  ],
+                ),
+                const VerticalDivider(thickness: 1, width: 1),
+                Expanded(
+                  child: _pages[_selectedIndex],
+                ),
+              ],
+            ),
+          );
+        }
+      },
     );
   }
 }
 
-// 1. HomeScreen Tab (Sudah Perbaikan Error)
+// 1. HomeScreen Tab
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -119,7 +165,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Beranda Utama'), // Perbaikan typo tanda petik
+        title: const Text('Beranda Utama'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       body: Padding(
@@ -127,7 +173,6 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Poin 42: Identitas Mahasiswa di HomeScreen
             Card(
               color: Theme.of(context).colorScheme.surfaceContainerHighest,
               child: Padding(
@@ -139,7 +184,7 @@ class HomeScreen extends StatelessWidget {
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [ 
+                        children: [
                           const Text(
                             'Selamat Datang!',
                             style: TextStyle(
@@ -158,7 +203,7 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             const Text(
-              'SEMANGAT BELAJAR BAGUS',
+              'SEAMANGAT BELAJAR BAGUS',
               style: TextStyle(fontSize: 15),
             ),
           ],
@@ -168,7 +213,7 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-// 2. CoursesScreen Tab (Daftar Mata Kuliah & Push ke Detail)
+// 2. CoursesScreen Tab
 class CoursesScreen extends StatelessWidget {
   const CoursesScreen({super.key});
 
@@ -245,7 +290,6 @@ class ProfileScreen extends StatelessWidget {
               child: Icon(Icons.person, size: 50),
             ),
             const SizedBox(height: 16),
-            // Poin 42: Identitas Mahasiswa di ProfileScreen
             Text(
               studentName,
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -273,7 +317,7 @@ class ProfileScreen extends StatelessWidget {
   }
 }
 
-// Halaman Detail Mata Kuliah (Dipanggil lewat Navigator.push dari CoursesScreen)
+// Halaman Detail Mata Kuliah
 class CourseDetailPage extends StatelessWidget {
   final Map<String, dynamic> course;
 
