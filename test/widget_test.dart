@@ -3,10 +3,10 @@ import 'package:praktikum_5_course_explorer/main.dart';
 
 void main() {
   testWidgets('Course Explorer smoke test', (WidgetTester tester) async {
-    // Build aplikasi CourseExplorerApp
-    await tester.pumpWidget(const DebuggingChallengeApp());
+    // 1. Ubah DebuggingChallengeApp menjadi CourseExplorerApp
+    await tester.pumpWidget(const CourseExplorerApp());
 
-    // Verifikasi bahwa judul AppBar 'Course Explorer' muncul di layar
-    expect(find.text('Course Explorer'), findsOneWidget);
+    // 2. Sesuaikan teks pencarian dengan judul AppBar halaman utama ('Course Explorer - Home')
+    expect(find.text('Course Explorer - Home'), findsOneWidget);
   });
 }
