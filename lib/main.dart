@@ -46,7 +46,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Tahap 13 - Form Input dan Validasi',
+      title: 'Tahap 14 - SnackBar, Dialog, & Loading Feedback',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
@@ -204,7 +204,11 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             const Text(
-              'SEMANGAT BELAJAR BAGUS):\n',
+              'Petunjuk Tahap 14 (SnackBar, Dialog, & Loading Feedback):\n'
+              '• Buka tab "Feedback" dan isi form komentar (min. 5 karakter).\n'
+              '• Tekan "Kirim Feedback" -> Konfirmasi AlertDialog muncul sebelum aksi dikirim.\n'
+              '• Setelah disetujui, indikator CircularProgressIndicator aktif selama simulasi loading.\n'
+              '• Setelah selesai, SnackBar pemberitahuan sukses akan ditampilkan di layar.',
               style: TextStyle(fontSize: 15, height: 1.5),
             ),
           ],
@@ -214,7 +218,7 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-// 2. CoursesScreen Tab (Tahap 12: InkWell, GestureDetector, & Favorite)
+// 2. CoursesScreen Tab
 class CoursesScreen extends StatefulWidget {
   const CoursesScreen({super.key});
 
@@ -352,7 +356,7 @@ class _CoursesScreenState extends State<CoursesScreen> {
   }
 }
 
-// 3. FeedbackFormScreen Tab (Tahap 13: Poin 51-54 - Form Input & Validasi)
+// 3. FeedbackFormScreen Tab (Tahap 14: SnackBar, Dialog, & Loading State)
 class FeedbackFormScreen extends StatefulWidget {
   const FeedbackFormScreen({super.key});
 
@@ -361,13 +365,14 @@ class FeedbackFormScreen extends StatefulWidget {
 }
 
 class _FeedbackFormScreenState extends State<FeedbackFormScreen> {
-  // GlobalKey untuk mengontrol dan menguji validasi FormState (Materi Tahap 13)
   final _formKey = GlobalKey<FormState>();
 
-  // TextEditingController dengan nilai awal dari konstanta identitas (Poin 52)
   late final TextEditingController _nameController;
   late final TextEditingController _nimController;
   final TextEditingController _commentController = TextEditingController();
+
+  // Poin 57: State boolean untuk kontrol indikator loading
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -384,40 +389,67 @@ class _FeedbackFormScreenState extends State<FeedbackFormScreen> {
     super.dispose();
   }
 
-  // Poin 54: Fungsi submit dengan validasi sebelum menampilkan hasil
-  void _submitForm() {
-    if (_formKey.currentState!.validate()) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Feedback Terkirim'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Nama: ${_nameController.text}'),
-              const SizedBox(height: 4),
-              Text('NIM: ${_nimController.text}'),
-              const SizedBox(height: 12),
-              const Text(
-                'Komentar:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(_commentController.text),
-            ],
+  void _handleSubmit() {
+    // 1. Validasi isi form terlebih dahulu
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    // Poin 56: Tampilkan AlertDialog konfirmasi sebelum aksi penting (pengiriman data)
+    showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Konfirmasi Pengiriman'),
+          content: Text(
+            'Apakah Anda yakin ingin mengirim feedback ini atas nama ${_nameController.text} (${_nimController.text})?',
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                _commentController.clear();
-              },
-              child: const Text('OK'),
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Batal'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Kirim'),
             ),
           ],
-        ),
-      );
-    }
+        );
+      },
+    ).then((confirmed) async {
+      // Jika pengguna menekan tombol "Kirim"
+      if (confirmed == true) {
+        // Poin 57: Mulai simulasi loading
+        setState(() {
+          _isLoading = true;
+        });
+
+        // Simulasi delay async (2 detik)
+        await Future.delayed(const Duration(seconds: 2));
+
+        if (!mounted) return;
+
+        // Hentikan indikator loading
+        setState(() {
+          _isLoading = false;
+        });
+
+        // Reset input komentar
+        _commentController.clear();
+
+        // Poin 55: Tampilkan SnackBar pemberitahuan sukses setelah pengiriman selesai
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Terima kasih! Feedback dari $studentName ($studentId) berhasil dikirim.',
+            ),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    });
   }
 
   @override
@@ -429,7 +461,6 @@ class _FeedbackFormScreenState extends State<FeedbackFormScreen> {
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        // Poin 51: Menggunakan Form + GlobalKey<FormState>
         child: Form(
           key: _formKey,
           child: Column(
@@ -443,6 +474,7 @@ class _FeedbackFormScreenState extends State<FeedbackFormScreen> {
               // Field Nama (Terisi default)
               TextFormField(
                 controller: _nameController,
+                enabled: !_isLoading, // Disable saat loading
                 decoration: const InputDecoration(
                   labelText: 'Nama Lengkap',
                   border: OutlineInputBorder(),
@@ -459,6 +491,7 @@ class _FeedbackFormScreenState extends State<FeedbackFormScreen> {
               // Field NIM (Terisi default)
               TextFormField(
                 controller: _nimController,
+                enabled: !_isLoading, // Disable saat loading
                 decoration: const InputDecoration(
                   labelText: 'NIM',
                   border: OutlineInputBorder(),
@@ -472,9 +505,10 @@ class _FeedbackFormScreenState extends State<FeedbackFormScreen> {
                 },
               ),
               const SizedBox(height: 16),
-              // Field Komentar (Poin 53: Wajib minimal 5 karakter)
+              // Field Komentar (Minimal 5 Karakter)
               TextFormField(
                 controller: _commentController,
+                enabled: !_isLoading, // Disable saat loading
                 maxLines: 4,
                 decoration: const InputDecoration(
                   labelText: 'Komentar / Feedback',
@@ -494,16 +528,38 @@ class _FeedbackFormScreenState extends State<FeedbackFormScreen> {
                 },
               ),
               const SizedBox(height: 24),
-              // Tombol Submit
+              // Poin 57: Tombol Submit dengan Indikator Loading (CircularProgressIndicator)
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: _submitForm,
-                  icon: const Icon(Icons.send),
-                  label: const Text('Kirim Feedback'),
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _handleSubmit,
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14.0),
                   ),
+                  child: _isLoading
+                      ? const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.5,
+                                color: Colors.white,
+                              ),
+                            ),
+                            SizedBox(width: 12),
+                            Text('Mengirim...'),
+                          ],
+                        )
+                      : const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.send),
+                            SizedBox(width: 8),
+                            Text('Kirim Feedback'),
+                          ],
+                        ),
                 ),
               ),
             ],
