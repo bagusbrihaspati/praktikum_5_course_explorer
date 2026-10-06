@@ -4,31 +4,35 @@ import 'package:flutter/material.dart';
 const String studentName = 'I Ketut Bagus Brihaspati';
 const String studentId = '2415051090';
 
-// List Data Course (Mata Kuliah)
+// List Data Course (Mata Kuliah) dengan tambahaan state 'isFavorite' (Poin 48)
 final List<Map<String, dynamic>> courses = [
   {
     'title': 'Pemrograman Mobile',
     'code': 'PTI1501',
     'credits': 3,
     'status': 'Wajib',
+    'isFavorite': false,
   },
   {
     'title': 'Pengolahan Citra Digital',
     'code': 'PTI1502',
     'credits': 3,
     'status': 'Wajib',
+    'isFavorite': false,
   },
   {
     'title': 'Kecerdasan Buatan',
     'code': 'PTI1503',
     'credits': 3,
     'status': 'Pilihan',
+    'isFavorite': false,
   },
   {
     'title': 'Jaringan Komputer',
     'code': 'PTI1504',
     'credits': 3,
     'status': 'Wajib',
+    'isFavorite': false,
   },
 ];
 
@@ -42,7 +46,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Tahap 11 - Adaptive Navigation',
+      title: 'Tahap 12 - User Interaction & Feedback',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
@@ -62,7 +66,6 @@ class MainNavigationScreen extends StatefulWidget {
 }
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
-  // Poin 46: selectedIndex disimpan di level State agar tidak reset saat layout berubah
   int _selectedIndex = 0;
 
   late final List<Widget> _pages;
@@ -79,12 +82,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Poin 43: Gunakan LayoutBuilder pada shell aplikasi
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Breakpoint 840px untuk membedakan Compact vs Expanded
         if (constraints.maxWidth < 840) {
-          // Poin 44: Compact Layout menggunakan NavigationBar (Bottom)
+          // Layout Compact menggunakan NavigationBar
           return Scaffold(
             body: _pages[_selectedIndex],
             bottomNavigationBar: NavigationBar(
@@ -114,7 +115,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             ),
           );
         } else {
-          // Poin 45: Expanded Layout menggunakan NavigationRail (Side)
+          // Layout Expanded menggunakan NavigationRail
           return Scaffold(
             body: Row(
               children: [
@@ -203,8 +204,8 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             const Text(
-              'SEAMANGAT BELAJAR BAGUS',
-              style: TextStyle(fontSize: 15),
+              'SEMANGAT BELAJAR BAGUS',
+              style: TextStyle(fontSize: 15, height: 1.5),
             ),
           ],
         ),
@@ -213,10 +214,15 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-// 2. CoursesScreen Tab
-class CoursesScreen extends StatelessWidget {
+// 2. CoursesScreen Tab 
+class CoursesScreen extends StatefulWidget {
   const CoursesScreen({super.key});
 
+  @override
+  State<CoursesScreen> createState() => _CoursesScreenState();
+}
+
+class _CoursesScreenState extends State<CoursesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -229,38 +235,120 @@ class CoursesScreen extends StatelessWidget {
         itemCount: courses.length,
         itemBuilder: (context, index) {
           final course = courses[index];
+          final bool isFav = course['isFavorite'] ?? false;
+
           return Card(
             elevation: 2,
             margin: const EdgeInsets.only(bottom: 12.0),
-            child: ListTile(
-              leading: CircleAvatar(
-                child: Text('${course['credits']} SKS'),
-              ),
-              title: Text(
-                course['title'],
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              subtitle: Text('Kode: ${course['code']} | Status: ${course['status']}'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () async {
-                final result = await Navigator.push<bool>(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => CourseDetailPage(course: course),
+            clipBehavior: Clip.antiAlias, // Memastikan efek InkWell rapi di dalam Card
+            // Poin 50: GestureDetector untuk gesture long press
+            child: GestureDetector(
+              onLongPress: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text(course['title']),
+                    content: Text(
+                      'Informasi Singkat:\n'
+                      '• Kode: ${course['code']}\n'
+                      '• Beban SKS: ${course['credits']} SKS\n'
+                      '• Kategori: ${course['status']}\n\n'
+                      'Diperiksa oleh $studentName ($studentId)',
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Tutup'),
+                      ),
+                    ],
                   ),
                 );
-
-                if (result == true && context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Mata kuliah "${course['title']}" difavoritkan oleh $studentName!',
-                      ),
-                      backgroundColor: Colors.green,
+              },
+              // Poin 47: InkWell untuk efek ripple saat tap
+              child: InkWell(
+                onTap: () async {
+                  final result = await Navigator.push<bool>(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => CourseDetailPage(course: course),
                     ),
                   );
-                }
-              },
+
+                  if (result == true) {
+                    setState(() {
+                      course['isFavorite'] = true;
+                    });
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Mata kuliah "${course['title']}" difavoritkan oleh $studentName!',
+                          ),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    }
+                  }
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        child: Text('${course['credits']} SKS'),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              course['title'],
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Kode: ${course['code']} | Status: ${course['status']}',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Poin 48 & 49: Tombol Favorite dengan state boolean & icon berbeda
+                      IconButton(
+                        icon: Icon(
+                          isFav ? Icons.favorite : Icons.favorite_border,
+                          color: isFav ? Colors.red : Colors.grey,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            // Toggle state favorite
+                            course['isFavorite'] = !isFav;
+                          });
+
+                          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                course['isFavorite']
+                                    ? '"${course['title']}" ditambahkan ke Favorit.'
+                                    : '"${course['title']}" dihapus dari Favorit.',
+                              ),
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           );
         },
