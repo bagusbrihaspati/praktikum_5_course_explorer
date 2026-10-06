@@ -42,20 +42,135 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Tahap 9 - Returning Data from Screen',
+      title: 'Tahap 10 - NavigationBar',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const HomePage(),
+      home: const MainNavigationScreen(),
     );
   }
 }
 
-// 1. HomePage - Menunggu Nilai Kembalian dari Detail Screen
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+// Poin 40: StatefulWidget untuk mengelola selectedIndex navigasi utama
+class MainNavigationScreen extends StatefulWidget {
+  const MainNavigationScreen({super.key});
+
+  @override
+  State<MainNavigationScreen> createState() => _MainNavigationScreenState();
+}
+
+class _MainNavigationScreenState extends State<MainNavigationScreen> {
+  int _selectedIndex = 0;
+
+  // Poin 41: Daftar widget/halaman yang ditampilkan sesuai index
+  late final List<Widget> _pages;
+
+  @override
+  void initState() {
+    super.initState();
+    _pages = [
+      const HomeScreen(),
+      const CoursesScreen(),
+      const ProfileScreen(),
+    ];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _pages[_selectedIndex],
+      // Poin 39 & 40: NavigationBar Material 3
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _selectedIndex,
+        onDestinationSelected: (int index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.home_outlined),
+            selectedIcon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.school_outlined),
+            selectedIcon: Icon(Icons.school),
+            label: 'Courses',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.person_outline),
+            selectedIcon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// 1. HomeScreen Tab (Sudah Perbaikan Error)
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Beranda Utama'), // Perbaikan typo tanda petik
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Poin 42: Identitas Mahasiswa di HomeScreen
+            Card(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  children: [
+                    const Icon(Icons.school, size: 36, color: Colors.deepPurple),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [ 
+                          const Text(
+                            'Selamat Datang!',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text('Praktikan: $studentName'),
+                          Text('NIM: $studentId'),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'SEMANGAT BELAJAR BAGUS',
+              style: TextStyle(fontSize: 15),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// 2. CoursesScreen Tab (Daftar Mata Kuliah & Push ke Detail)
+class CoursesScreen extends StatelessWidget {
+  const CoursesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -66,37 +181,9 @@ class HomePage extends StatelessWidget {
       ),
       body: ListView.builder(
         padding: const EdgeInsets.all(16.0),
-        itemCount: courses.length + 1, // +1 untuk Header Identitas Mahasiswa
+        itemCount: courses.length,
         itemBuilder: (context, index) {
-          // Item 0: Card Identitas Mahasiswa
-          if (index == 0) {
-            return Card(
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
-              margin: const EdgeInsets.only(bottom: 16.0),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  children: [
-                    const Icon(Icons.person, size: 32),
-                    const SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text(
-                          'Mahasiswa: $studentName',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Text('NIM: $studentId'),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }
-
-          // Item 1..n: List Course
-          final course = courses[index - 1];
+          final course = courses[index];
           return Card(
             elevation: 2,
             margin: const EdgeInsets.only(bottom: 12.0),
@@ -111,7 +198,6 @@ class HomePage extends StatelessWidget {
               subtitle: Text('Kode: ${course['code']} | Status: ${course['status']}'),
               trailing: const Icon(Icons.chevron_right),
               onTap: () async {
-                // Poin 35 & 37: Menggunakan await untuk menerima hasil dari CourseDetailPage
                 final result = await Navigator.push<bool>(
                   context,
                   MaterialPageRoute(
@@ -119,15 +205,13 @@ class HomePage extends StatelessWidget {
                   ),
                 );
 
-                // Jika result bernilai true, tampilkan SnackBar
                 if (result == true && context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                        'Mata kuliah "${course['title']}" berhasil ditambahkan ke Favorit oleh $studentName!',
+                        'Mata kuliah "${course['title']}" difavoritkan oleh $studentName!',
                       ),
                       backgroundColor: Colors.green,
-                      duration: const Duration(seconds: 3),
                     ),
                   );
                 }
@@ -140,7 +224,56 @@ class HomePage extends StatelessWidget {
   }
 }
 
-// 2. CourseDetailPage - Mengembalikan Nilai ke Screen Sebelumnya
+// 3. ProfileScreen Tab
+class ProfileScreen extends StatelessWidget {
+  const ProfileScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Profil Mahasiswa'),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
+            const CircleAvatar(
+              radius: 40,
+              child: Icon(Icons.person, size: 50),
+            ),
+            const SizedBox(height: 16),
+            // Poin 42: Identitas Mahasiswa di ProfileScreen
+            Text(
+              studentName,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'NIM: $studentId',
+              style: const TextStyle(fontSize: 16, color: Colors.grey),
+            ),
+            const Divider(height: 32),
+            const ListTile(
+              leading: Icon(Icons.school),
+              title: Text('Program Studi'),
+              subtitle: Text('Pendidikan Teknik Informatika'),
+            ),
+            const ListTile(
+              leading: Icon(Icons.location_city),
+              title: Text('Universitas'),
+              subtitle: Text('Universitas Pendidikan Ganesha'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Halaman Detail Mata Kuliah (Dipanggil lewat Navigator.push dari CoursesScreen)
 class CourseDetailPage extends StatelessWidget {
   final Map<String, dynamic> course;
 
@@ -161,7 +294,6 @@ class CourseDetailPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Card Detail Mata Kuliah
             Card(
               elevation: 3,
               child: Padding(
@@ -177,94 +309,22 @@ class CourseDetailPage extends StatelessWidget {
                       ),
                     ),
                     const Divider(height: 24),
-                    Row(
-                      children: [
-                        const Icon(Icons.code, color: Colors.deepPurple),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Kode Mata Kuliah: ${course['code']}',
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        const Icon(Icons.credit_card, color: Colors.deepPurple),
-                        const SizedBox(width: 8),
-                        Text(
-                          'SKS / Credits: ${course['credits']}',
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        const Icon(Icons.category, color: Colors.deepPurple),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Status: ${course['status']}',
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                      ],
-                    ),
+                    Text('Kode Mata Kuliah: ${course['code']}'),
+                    const SizedBox(height: 8),
+                    Text('SKS / Credits: ${course['credits']}'),
+                    const SizedBox(height: 8),
+                    Text('Status: ${course['status']}'),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 20),
-
-            // Identitas Mahasiswa
-            Container(
-              padding: const EdgeInsets.all(12.0),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.badge_outlined),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      'Praktikan: $studentName ($studentId)',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
             const Spacer(),
-
-            // Poin 35 & 36: Tombol 'Pilih/Favorite' yang mengembalikan nilai true
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed: () {
-                  // Kembali ke screen sebelumnya sambil membawa nilai true
-                  Navigator.pop(context, true);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepPurple,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                ),
+                onPressed: () => Navigator.pop(context, true),
                 icon: const Icon(Icons.favorite),
-                label: const Text('Pilih / Favoritkan Mata Kuliah'),
-              ),
-            ),
-            const SizedBox(height: 10),
-
-            // Tombol Batal / Kembali tanpa mengirimkan data
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: () => Navigator.pop(context, false),
-                icon: const Icon(Icons.arrow_back),
-                label: const Text('Batal'),
+                label: const Text('Favoritkan Mata Kuliah'),
               ),
             ),
           ],
