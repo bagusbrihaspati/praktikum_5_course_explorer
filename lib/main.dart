@@ -438,8 +438,15 @@ class _CoursesPageState extends State<CoursesPage> {
     return 3;
   }
 
-  // Single Source of Truth: Parent menyimpan kumpulan ID yang difavoritkan
+  // Tahap 4: Menggunakan ValueNotifier untuk memantau jumlah favorit secara efisien
+  final ValueNotifier<int> _favoritesCounter = ValueNotifier<int>(0);
   final Set<String> _favoriteCourseIds = {};
+
+  @override
+  void dispose() {
+    _favoritesCounter.dispose(); 
+    super.dispose();
+  }
 
   void _toggleFavorite(String courseId) {
     setState(() {
@@ -448,12 +455,14 @@ class _CoursesPageState extends State<CoursesPage> {
       } else {
         _favoriteCourseIds.add(courseId);
       }
+      _favoritesCounter.value = _favoriteCourseIds.length;
     });
   }
 
   void _clearAllFavorites() {
     setState(() {
       _favoriteCourseIds.clear();
+      _favoritesCounter.value = 0;
     });
   }
 
@@ -472,11 +481,18 @@ class _CoursesPageState extends State<CoursesPage> {
               children: [
                 const StudentHeaderCard(),
                 const SizedBox(height: 12),
-                // Child 1: Widget ringkasan membaca data langsung dari Single Source of Truth
-                CoursesSummary(
-                  totalFavorites: _favoriteCourseIds.length,
-                  onClearAll: _clearAllFavorites,
+                
+                // Tahap 4: ValueListenableBuilder hanya me-rebuild widget ini saja saat _favoritesCounter berubah
+                ValueListenableBuilder<int>(
+                  valueListenable: _favoritesCounter,
+                  builder: (context, totalFavs, child) {
+                    return CoursesSummary(
+                      totalFavorites: totalFavs,
+                      onClearAll: _clearAllFavorites,
+                    );
+                  },
                 ),
+                
                 const SizedBox(height: 12),
                 Text(
                   'Katalog Course (${dummyCourses.length} Item - Grid $columns Kolom):',
@@ -496,7 +512,6 @@ class _CoursesPageState extends State<CoursesPage> {
                       final course = dummyCourses[index];
                       final bool isFav = _favoriteCourseIds.contains(course.id);
 
-                      // Child 2: Menerima data boolean via constructor dan memicu aksi via callback
                       return CourseCardWidget(
                         course: course,
                         isFavorite: isFav,
@@ -545,7 +560,7 @@ class CourseCardWidget extends StatelessWidget {
             ),
           );
         },
-        
+
         child: GestureDetector(
           onLongPress: () {
             showDialog(
