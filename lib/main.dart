@@ -438,14 +438,22 @@ class _CoursesPageState extends State<CoursesPage> {
     return 3;
   }
 
-  // State dipegang oleh Parent (CoursesPage)
-  int get _favoriteCount => dummyCourses.where((c) => c.isFavorite).length;
+  // Single Source of Truth: Parent menyimpan kumpulan ID yang difavoritkan
+  final Set<String> _favoriteCourseIds = {};
 
-  void _clearFavorites() {
+  void _toggleFavorite(String courseId) {
     setState(() {
-      for (var course in dummyCourses) {
-        course.isFavorite = false;
+      if (_favoriteCourseIds.contains(courseId)) {
+        _favoriteCourseIds.remove(courseId);
+      } else {
+        _favoriteCourseIds.add(courseId);
       }
+    });
+  }
+
+  void _clearAllFavorites() {
+    setState(() {
+      _favoriteCourseIds.clear();
     });
   }
 
@@ -464,10 +472,10 @@ class _CoursesPageState extends State<CoursesPage> {
               children: [
                 const StudentHeaderCard(),
                 const SizedBox(height: 12),
-                // Child 1 yang menerima state & callback via constructor (Prop Drilling)
+                // Child 1: Widget ringkasan membaca data langsung dari Single Source of Truth
                 CoursesSummary(
-                  totalFavorites: _favoriteCount,
-                  onClearAll: _clearFavorites,
+                  totalFavorites: _favoriteCourseIds.length,
+                  onClearAll: _clearAllFavorites,
                 ),
                 const SizedBox(height: 12),
                 Text(
@@ -486,14 +494,13 @@ class _CoursesPageState extends State<CoursesPage> {
                     itemCount: dummyCourses.length,
                     itemBuilder: (context, index) {
                       final course = dummyCourses[index];
-                      // Child 2 yang menerima callback untuk mengubah state parent
+                      final bool isFav = _favoriteCourseIds.contains(course.id);
+
+                      // Child 2: Menerima data boolean via constructor dan memicu aksi via callback
                       return CourseCardWidget(
                         course: course,
-                        onFavoriteToggle: () {
-                          setState(() {
-                            course.isFavorite = !course.isFavorite;
-                          });
-                        },
+                        isFavorite: isFav,
+                        onFavoriteChanged: () => _toggleFavorite(course.id),
                       );
                     },
                   ),
@@ -509,12 +516,14 @@ class _CoursesPageState extends State<CoursesPage> {
 
 class CourseCardWidget extends StatelessWidget {
   final Course course;
-  final VoidCallback onFavoriteToggle;
+  final bool isFavorite;
+  final VoidCallback onFavoriteChanged;
 
   const CourseCardWidget({
     super.key,
     required this.course,
-    required this.onFavoriteToggle,
+    required this.isFavorite,
+    required this.onFavoriteChanged,
   });
 
   @override
@@ -529,23 +538,14 @@ class CourseCardWidget extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () async {
-          final result = await Navigator.push<bool>(
+          await Navigator.push<bool>(
             context,
             MaterialPageRoute(
               builder: (context) => CourseDetailPage(course: course),
             ),
           );
-
-          if (result == true && context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Status favorit untuk "${course.title}" diperbarui oleh $studentName!'),
-                duration: const Duration(seconds: 2),
-                backgroundColor: Colors.blue.shade800,
-              ),
-            );
-          }
         },
+        
         child: GestureDetector(
           onLongPress: () {
             showDialog(
@@ -578,10 +578,10 @@ class CourseCardWidget extends StatelessWidget {
                     ),
                     IconButton(
                       icon: Icon(
-                        course.isFavorite ? Icons.favorite : Icons.favorite_border,
-                        color: course.isFavorite ? Colors.blue.shade700 : Colors.blue.shade300,
+                        isFavorite ? Icons.favorite : Icons.favorite_border,
+                        color: isFavorite ? Colors.blue.shade700 : Colors.blue.shade300,
                       ),
-                      onPressed: onFavoriteToggle,
+                      onPressed: onFavoriteChanged,
                     ),
                   ],
                 ),
