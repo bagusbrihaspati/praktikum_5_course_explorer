@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'course_state.dart';
 
 const String studentName = 'I Ketut Bagus Brihaspati';
 const String studentId = '2415051090';
@@ -438,32 +439,13 @@ class _CoursesPageState extends State<CoursesPage> {
     return 3;
   }
 
-  // Tahap 4: Menggunakan ValueNotifier untuk memantau jumlah favorit secara efisien
-  final ValueNotifier<int> _favoritesCounter = ValueNotifier<int>(0);
-  final Set<String> _favoriteCourseIds = {};
+  // Tahap 5: Menggunakan instance ChangeNotifier terpisah
+  final CourseState _courseState = CourseState();
 
   @override
   void dispose() {
-    _favoritesCounter.dispose(); 
+    _courseState.dispose();
     super.dispose();
-  }
-
-  void _toggleFavorite(String courseId) {
-    setState(() {
-      if (_favoriteCourseIds.contains(courseId)) {
-        _favoriteCourseIds.remove(courseId);
-      } else {
-        _favoriteCourseIds.add(courseId);
-      }
-      _favoritesCounter.value = _favoriteCourseIds.length;
-    });
-  }
-
-  void _clearAllFavorites() {
-    setState(() {
-      _favoriteCourseIds.clear();
-      _favoritesCounter.value = 0;
-    });
   }
 
   @override
@@ -474,54 +456,58 @@ class _CoursesPageState extends State<CoursesPage> {
         builder: (context, constraints) {
           final int columns = _getCrossAxisCount(constraints.maxWidth);
 
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const StudentHeaderCard(),
-                const SizedBox(height: 12),
-                
-                // Tahap 4: ValueListenableBuilder hanya me-rebuild widget ini saja saat _favoritesCounter berubah
-                ValueListenableBuilder<int>(
-                  valueListenable: _favoritesCounter,
-                  builder: (context, totalFavs, child) {
-                    return CoursesSummary(
-                      totalFavorites: totalFavs,
-                      onClearAll: _clearAllFavorites,
-                    );
-                  },
-                ),
-                
-                const SizedBox(height: 12),
-                Text(
-                  'Katalog Course (${dummyCourses.length} Item - Grid $columns Kolom):',
-                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue.shade900, fontSize: 16),
-                ),
-                const SizedBox(height: 8),
-                Expanded(
-                  child: GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: columns,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                      childAspectRatio: constraints.maxWidth < 600 ? 2.3 : 1.8,
+          // ListenableBuilder mendengarkan perubahan dari CourseState yang memanggil notifyListeners()
+          return ListenableBuilder(
+            listenable: _courseState,
+            builder: (context, child) {
+              return Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const StudentHeaderCard(),
+                    const SizedBox(height: 12),
+                    CoursesSummary(
+                      totalFavorites: _courseState.totalFavorites,
+                      onClearAll: _courseState.clearAllFavorites,
                     ),
-                    itemCount: dummyCourses.length,
-                    itemBuilder: (context, index) {
-                      final course = dummyCourses[index];
-                      final bool isFav = _favoriteCourseIds.contains(course.id);
+                    const SizedBox(height: 12),
+                    Text(
+                      'Katalog Course (${dummyCourses.length} Item - Grid $columns Kolom):',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue.shade900,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Expanded(
+                      child: GridView.builder(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: columns,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                          childAspectRatio: constraints.maxWidth < 600 ? 2.3 : 1.8,
+                        ),
+                        itemCount: dummyCourses.length,
+                        itemBuilder: (context, index) {
+                          final course = dummyCourses[index];
+                          final bool isFav = _courseState.isFavorite(course.id);
 
-                      return CourseCardWidget(
-                        course: course,
-                        isFavorite: isFav,
-                        onFavoriteChanged: () => _toggleFavorite(course.id),
-                      );
-                    },
-                  ),
+                          return CourseCardWidget(
+                            course: course,
+                            isFavorite: isFav,
+                            onFavoriteChanged: () {
+                              _courseState.toggleFavorite(course.id);
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              );
+            },
           );
         },
       ),
