@@ -392,11 +392,61 @@ class CoursesPage extends StatefulWidget {
   State<CoursesPage> createState() => _CoursesPageState();
 }
 
+class CoursesSummary extends StatelessWidget {
+  final int totalFavorites;
+  final VoidCallback onClearAll;
+
+  const CoursesSummary({
+    super.key,
+    required this.totalFavorites,
+    required this.onClearAll,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: Colors.blue.shade50,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: Colors.blue.shade200),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Total Favorit Dipilih: $totalFavorites',
+              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue.shade900),
+            ),
+            TextButton.icon(
+              onPressed: onClearAll,
+              icon: const Icon(Icons.clear_all, size: 18),
+              label: const Text('Reset'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _CoursesPageState extends State<CoursesPage> {
   int _getCrossAxisCount(double width) {
     if (width < 600) return 1;
     if (width < 840) return 2;
     return 3;
+  }
+
+  // State dipegang oleh Parent (CoursesPage)
+  int get _favoriteCount => dummyCourses.where((c) => c.isFavorite).length;
+
+  void _clearFavorites() {
+    setState(() {
+      for (var course in dummyCourses) {
+        course.isFavorite = false;
+      }
+    });
   }
 
   @override
@@ -414,6 +464,12 @@ class _CoursesPageState extends State<CoursesPage> {
               children: [
                 const StudentHeaderCard(),
                 const SizedBox(height: 12),
+                // Child 1 yang menerima state & callback via constructor (Prop Drilling)
+                CoursesSummary(
+                  totalFavorites: _favoriteCount,
+                  onClearAll: _clearFavorites,
+                ),
+                const SizedBox(height: 12),
                 Text(
                   'Katalog Course (${dummyCourses.length} Item - Grid $columns Kolom):',
                   style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue.shade900, fontSize: 16),
@@ -430,6 +486,7 @@ class _CoursesPageState extends State<CoursesPage> {
                     itemCount: dummyCourses.length,
                     itemBuilder: (context, index) {
                       final course = dummyCourses[index];
+                      // Child 2 yang menerima callback untuk mengubah state parent
                       return CourseCardWidget(
                         course: course,
                         onFavoriteToggle: () {
