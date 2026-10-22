@@ -447,9 +447,6 @@ class _CoursesPageState extends State<CoursesPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Tahap 6: Mengakses CourseState dari Provider yang terpasang di atas tree
-    final courseState = Provider.of<CourseState>(context);
-
     return Scaffold(
       appBar: AppBar(title: const Text('Daftar Mata Kuliah')),
       body: LayoutBuilder(
@@ -463,10 +460,18 @@ class _CoursesPageState extends State<CoursesPage> {
               children: [
                 const StudentHeaderCard(),
                 const SizedBox(height: 12),
-                CoursesSummary(
-                  totalFavorites: courseState.totalFavorites,
-                  onClearAll: courseState.clearAllFavorites,
+
+                // Tahap 7: Menggunakan Consumer untuk melokalisasi rebuild widget ringkasan
+                Consumer<CourseState>(
+                  builder: (context, courseState, child) {
+                    return CoursesSummary(
+                      totalFavorites: courseState.totalFavorites,
+                      // Tahap 7: context.read digunakan saat memanggil method aksi
+                      onClearAll: () => context.read<CourseState>().clearAllFavorites(),
+                    );
+                  },
                 ),
+
                 const SizedBox(height: 12),
                 Text(
                   'Katalog Course (${dummyCourses.length} Item - Grid $columns Kolom):',
@@ -488,15 +493,8 @@ class _CoursesPageState extends State<CoursesPage> {
                     itemCount: dummyCourses.length,
                     itemBuilder: (context, index) {
                       final course = dummyCourses[index];
-                      final bool isFav = courseState.isFavorite(course.id);
-
-                      return CourseCardWidget(
-                        course: course,
-                        isFavorite: isFav,
-                        onFavoriteChanged: () {
-                          courseState.toggleFavorite(course.id);
-                        },
-                      );
+                      // Tahap 7: Tiap kartu mendengarkan state favoritnya sendiri secara efisien
+                      return CourseCardWidget(course: course);
                     },
                   ),
                 ),
@@ -511,18 +509,17 @@ class _CoursesPageState extends State<CoursesPage> {
 
 class CourseCardWidget extends StatelessWidget {
   final Course course;
-  final bool isFavorite;
-  final VoidCallback onFavoriteChanged;
 
   const CourseCardWidget({
     super.key,
     required this.course,
-    required this.isFavorite,
-    required this.onFavoriteChanged,
   });
 
   @override
   Widget build(BuildContext context) {
+    // Tahap 7: context.watch mendengarkan perubahan state untuk me-rebuild UI ikon favorit
+    final isFav = context.watch<CourseState>().isFavorite(course.id);
+
     return Card(
       elevation: 1,
       color: Colors.white,
@@ -568,15 +565,25 @@ class CourseCardWidget extends StatelessWidget {
                   children: [
                     Chip(
                       backgroundColor: Colors.blue.shade100,
-                      label: Text(course.code, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.blue.shade900)),
+                      label: Text(
+                        course.code,
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue.shade900,
+                        ),
+                      ),
                       visualDensity: VisualDensity.compact,
                     ),
                     IconButton(
                       icon: Icon(
-                        isFavorite ? Icons.favorite : Icons.favorite_border,
-                        color: isFavorite ? Colors.blue.shade700 : Colors.blue.shade300,
+                        isFav ? Icons.favorite : Icons.favorite_border,
+                        color: isFav ? Colors.blue.shade700 : Colors.blue.shade300,
                       ),
-                      onPressed: onFavoriteChanged,
+                      onPressed: () {
+                        // Tahap 7: context.read digunakan di dalam event handler onPressed
+                        context.read<CourseState>().toggleFavorite(course.id);
+                      },
                     ),
                   ],
                 ),
@@ -584,7 +591,10 @@ class CourseCardWidget extends StatelessWidget {
                   course.title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue.shade900),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue.shade900,
+                  ),
                 ),
                 Text(
                   '${course.credits} SKS | Level: ${course.level}',
