@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'course_state.dart';
+import 'models/course.dart';
 
 const String studentName = 'I Ketut Bagus Brihaspati';
 const String studentId = '2415051090';
@@ -44,38 +45,19 @@ class CourseExplorerApp extends StatelessWidget {
   }
 }
 
-class Course {
-  final String id;
-  final String code;
-  final String title;
-  final int credits;
-  final String category;
-  final String level;
-  final String description;
-  bool isFavorite;
-
-  Course({
-    required this.id,
-    required this.code,
-    required this.title,
-    required this.credits,
-    required this.category,
-    required this.level,
-    required this.description,
-    this.isFavorite = false,
-  });
-}
-
+// Dummy Courses menggunakan Model Course & factory fromJson (Tahap 8)
 final List<Course> dummyCourses = [
-  Course(
-    id: '1',
-    code: 'MOB04',
-    title: 'Pemrograman Flutter',
-    credits: 3,
-    category: 'Mobile',
-    level: 'Beginner',
-    description: 'Mempelajari dasar-dasar UI Flutter, Widget, Layouting, State Management, dan Navigasi.',
-  ),
+  Course.fromJson({
+    'id': '1',
+    'code': 'MOB04',
+    'title': 'Pemrograman Flutter',
+    'credits': 3,
+    'category': 'Mobile',
+    'level': 'Beginner',
+    'description':
+        'Mempelajari dasar-dasar UI Flutter, Widget, Layouting, State Management, dan Navigasi.',
+    'status': 'done',
+  }),
   Course(
     id: '2',
     code: 'WEB02',
@@ -83,7 +65,9 @@ final List<Course> dummyCourses = [
     credits: 3,
     category: 'Web',
     level: 'Intermediate',
-    description: 'Membangun aplikasi web modern menggunakan Framework PHP Laravel dan RESTful API.',
+    description:
+        'Membangun aplikasi web modern menggunakan Framework PHP Laravel dan RESTful API.',
+    status: 'done',
   ),
   Course(
     id: '3',
@@ -92,7 +76,9 @@ final List<Course> dummyCourses = [
     credits: 3,
     category: 'Network',
     level: 'Advanced',
-    description: 'Konfigurasi IP Addressing, Routing OSPF/BGP, VLAN, dan analisis heatmap Wi-Fi.',
+    description:
+        'Konfigurasi IP Addressing, Routing OSPF/BGP, VLAN, dan analisis heatmap Wi-Fi.',
+    status: 'done',
   ),
   Course(
     id: '4',
@@ -101,7 +87,9 @@ final List<Course> dummyCourses = [
     credits: 2,
     category: 'Multimedia',
     level: 'Intermediate',
-    description: 'Pembelajaran operasi piksel, transformasi geometris, kuantisasi, dan ruang warna YCbCr.',
+    description:
+        'Pembelajaran operasi piksel, transformasi geometris, kuantisasi, dan ruang warna YCbCr.',
+    status: 'active',
   ),
   Course(
     id: '5',
@@ -110,7 +98,9 @@ final List<Course> dummyCourses = [
     credits: 3,
     category: 'AI',
     level: 'Advanced',
-    description: 'Studi Inferensi Logika Fuzzy Sugeno, Teori Keputusan, Bayes, dan algoritma DFS/BFS.',
+    description:
+        'Studi Inferensi Logika Fuzzy Sugeno, Teori Keputusan, Bayes, dan algoritma DFS/BFS.',
+    status: 'active',
   ),
   Course(
     id: '6',
@@ -119,7 +109,9 @@ final List<Course> dummyCourses = [
     credits: 2,
     category: 'Design',
     level: 'Beginner',
-    description: 'Prinsip Design Thinking, pembuatan wireframe, prototyping, dan analisis kegunaan sistem.',
+    description:
+        'Prinsip Design Thinking, pembuatan wireframe, prototyping, dan analisis kegunaan sistem.',
+    status: 'active',
   ),
 ];
 
@@ -157,10 +149,26 @@ class _MainAdaptiveShellState extends State<MainAdaptiveShell> {
                 setState(() => _selectedIndex = index);
               },
               destinations: [
-                NavigationDestination(icon: Icon(Icons.home_outlined, color: Colors.blue.shade900), selectedIcon: Icon(Icons.home, color: Colors.blue.shade900), label: 'Home'),
-                NavigationDestination(icon: Icon(Icons.school_outlined, color: Colors.blue.shade900), selectedIcon: Icon(Icons.school, color: Colors.blue.shade900), label: 'Courses'),
-                NavigationDestination(icon: Icon(Icons.person_outlined, color: Colors.blue.shade900), selectedIcon: Icon(Icons.person, color: Colors.blue.shade900), label: 'Profile'),
-                NavigationDestination(icon: Icon(Icons.bug_report_outlined, color: Colors.blue.shade900), selectedIcon: Icon(Icons.bug_report, color: Colors.blue.shade900), label: 'Debug Lab'),
+                NavigationDestination(
+                  icon: Icon(Icons.home_outlined, color: Colors.blue.shade900),
+                  selectedIcon: Icon(Icons.home, color: Colors.blue.shade900),
+                  label: 'Home',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.school_outlined, color: Colors.blue.shade900),
+                  selectedIcon: Icon(Icons.school, color: Colors.blue.shade900),
+                  label: 'Courses',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.person_outlined, color: Colors.blue.shade900),
+                  selectedIcon: Icon(Icons.person, color: Colors.blue.shade900),
+                  label: 'Profile',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.bug_report_outlined, color: Colors.blue.shade900),
+                  selectedIcon: Icon(Icons.bug_report, color: Colors.blue.shade900),
+                  label: 'Debug Lab',
+                ),
               ],
             ),
           );
@@ -184,10 +192,26 @@ class _MainAdaptiveShellState extends State<MainAdaptiveShell> {
                     ),
                   ),
                   destinations: const [
-                    NavigationRailDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: Text('Home')),
-                    NavigationRailDestination(icon: Icon(Icons.school_outlined), selectedIcon: Icon(Icons.school), label: Text('Courses')),
-                    NavigationRailDestination(icon: Icon(Icons.person_outlined), selectedIcon: Icon(Icons.person), label: Text('Profile')),
-                    NavigationRailDestination(icon: Icon(Icons.bug_report_outlined), selectedIcon: Icon(Icons.bug_report), label: Text('Debug Lab')),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.home_outlined),
+                      selectedIcon: Icon(Icons.home),
+                      label: Text('Home'),
+                    ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.school_outlined),
+                      selectedIcon: Icon(Icons.school),
+                      label: Text('Courses'),
+                    ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.person_outlined),
+                      selectedIcon: Icon(Icons.person),
+                      label: Text('Profile'),
+                    ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.bug_report_outlined),
+                      selectedIcon: Icon(Icons.bug_report),
+                      label: Text('Debug Lab'),
+                    ),
                   ],
                 ),
                 const VerticalDivider(thickness: 1, width: 1),
@@ -209,7 +233,6 @@ class StudentHeaderCard extends StatefulWidget {
 }
 
 class _StudentHeaderCardState extends State<StudentHeaderCard> {
-  // Local State: Hanya berdampak pada widget ini sendiri menggunakan setState
   bool _isExpanded = false;
 
   @override
@@ -248,9 +271,7 @@ class _StudentHeaderCardState extends State<StudentHeaderCard> {
                       const SizedBox(height: 4),
                       Text(
                         'NIM: $studentId | Class: PTI 5A',
-                        style: TextStyle(
-                          color: Colors.blue.shade800,
-                        ),
+                        style: TextStyle(color: Colors.blue.shade800),
                       ),
                     ],
                   ),
@@ -294,8 +315,14 @@ class HomePage extends StatelessWidget {
     final orientation = MediaQuery.of(context).orientation;
 
     final List<String> skills = [
-      'Flutter', 'Dart', 'Laravel', 'PHP', 'UI/UX Design',
-      'Computer Network', 'Digital Image Processing', 'Git & GitHub'
+      'Flutter',
+      'Dart',
+      'Laravel',
+      'PHP',
+      'UI/UX Design',
+      'Computer Network',
+      'Digital Image Processing',
+      'Git & GitHub'
     ];
 
     return Scaffold(
@@ -321,18 +348,29 @@ class HomePage extends StatelessWidget {
                   children: [
                     Text(
                       'Informasi Lingkungan Layar (MediaQuery):',
-                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue.shade900),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue.shade900,
+                      ),
                     ),
                     const SizedBox(height: 8),
-                    Text('Width: ${size.width.toStringAsFixed(0)} px | Height: ${size.height.toStringAsFixed(0)} px'),
+                    Text(
+                        'Width: ${size.width.toStringAsFixed(0)} px | Height: ${size.height.toStringAsFixed(0)} px'),
                     Text('Orientation: ${orientation.name}'),
                     const SizedBox(height: 8),
                     Chip(
                       label: Text(
-                        size.width < 600 ? 'Mode: Compact (< 600px)' : 'Mode: Wide (>= 600px)',
-                        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue.shade900),
+                        size.width < 600
+                            ? 'Mode: Compact (< 600px)'
+                            : 'Mode: Wide (>= 600px)',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue.shade900,
+                        ),
                       ),
-                      backgroundColor: size.width < 600 ? Colors.blue.shade100 : Colors.lightBlue.shade100,
+                      backgroundColor: size.width < 600
+                          ? Colors.blue.shade100
+                          : Colors.lightBlue.shade100,
                     )
                   ],
                 ),
@@ -341,7 +379,10 @@ class HomePage extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               'Demo Proportion Flex Layout (2 : 1):',
-              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue.shade900),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.blue.shade900,
+              ),
             ),
             const SizedBox(height: 8),
             Row(
@@ -350,9 +391,18 @@ class HomePage extends StatelessWidget {
                   flex: 2,
                   child: Container(
                     height: 50,
-                    decoration: BoxDecoration(color: Colors.blue.shade600, borderRadius: BorderRadius.circular(8)),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade600,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                     alignment: Alignment.center,
-                    child: const Text('Flex 2', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    child: const Text(
+                      'Flex 2',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -360,9 +410,18 @@ class HomePage extends StatelessWidget {
                   flex: 1,
                   child: Container(
                     height: 50,
-                    decoration: BoxDecoration(color: Colors.blue.shade300, borderRadius: BorderRadius.circular(8)),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade300,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                     alignment: Alignment.center,
-                    child: Text('Flex 1', style: TextStyle(color: Colors.blue.shade900, fontWeight: FontWeight.bold)),
+                    child: Text(
+                      'Flex 1',
+                      style: TextStyle(
+                        color: Colors.blue.shade900,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -370,7 +429,10 @@ class HomePage extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               'Keterampilan Utama (Wrap Widget):',
-              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue.shade900),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.blue.shade900,
+              ),
             ),
             const SizedBox(height: 8),
             Wrap(
@@ -380,8 +442,15 @@ class HomePage extends StatelessWidget {
                 return Chip(
                   backgroundColor: Colors.blue.shade50,
                   side: BorderSide(color: Colors.blue.shade200),
-                  avatar: Icon(Icons.check_circle_outline, size: 16, color: Colors.blue.shade700),
-                  label: Text(skill, style: TextStyle(color: Colors.blue.shade900)),
+                  avatar: Icon(
+                    Icons.check_circle_outline,
+                    size: 16,
+                    color: Colors.blue.shade700,
+                  ),
+                  label: Text(
+                    skill,
+                    style: TextStyle(color: Colors.blue.shade900),
+                  ),
                 );
               }).toList(),
             ),
@@ -390,13 +459,6 @@ class HomePage extends StatelessWidget {
       ),
     );
   }
-}
-
-class CoursesPage extends StatefulWidget {
-  const CoursesPage({super.key});
-
-  @override
-  State<CoursesPage> createState() => _CoursesPageState();
 }
 
 class CoursesSummary extends StatelessWidget {
@@ -424,7 +486,10 @@ class CoursesSummary extends StatelessWidget {
           children: [
             Text(
               'Total Favorit Dipilih: $totalFavorites',
-              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue.shade900),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.blue.shade900,
+              ),
             ),
             TextButton.icon(
               onPressed: onClearAll,
@@ -436,6 +501,13 @@ class CoursesSummary extends StatelessWidget {
       ),
     );
   }
+}
+
+class CoursesPage extends StatefulWidget {
+  const CoursesPage({super.key});
+
+  @override
+  State<CoursesPage> createState() => _CoursesPageState();
 }
 
 class _CoursesPageState extends State<CoursesPage> {
@@ -460,18 +532,15 @@ class _CoursesPageState extends State<CoursesPage> {
               children: [
                 const StudentHeaderCard(),
                 const SizedBox(height: 12),
-
-                // Tahap 7: Menggunakan Consumer untuk melokalisasi rebuild widget ringkasan
                 Consumer<CourseState>(
                   builder: (context, courseState, child) {
                     return CoursesSummary(
                       totalFavorites: courseState.totalFavorites,
-                      // Tahap 7: context.read digunakan saat memanggil method aksi
-                      onClearAll: () => context.read<CourseState>().clearAllFavorites(),
+                      onClearAll: () =>
+                          context.read<CourseState>().clearAllFavorites(),
                     );
                   },
                 ),
-
                 const SizedBox(height: 12),
                 Text(
                   'Katalog Course (${dummyCourses.length} Item - Grid $columns Kolom):',
@@ -493,7 +562,6 @@ class _CoursesPageState extends State<CoursesPage> {
                     itemCount: dummyCourses.length,
                     itemBuilder: (context, index) {
                       final course = dummyCourses[index];
-                      // Tahap 7: Tiap kartu mendengarkan state favoritnya sendiri secara efisien
                       return CourseCardWidget(course: course);
                     },
                   ),
@@ -517,7 +585,6 @@ class CourseCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Tahap 7: context.watch mendengarkan perubahan state untuk me-rebuild UI ikon favorit
     final isFav = context.watch<CourseState>().isFavorite(course.id);
 
     return Card(
@@ -537,14 +604,18 @@ class CourseCardWidget extends StatelessWidget {
             ),
           );
         },
-
         child: GestureDetector(
           onLongPress: () {
             showDialog(
               context: context,
               builder: (context) => AlertDialog(
-                title: Text(course.title, style: TextStyle(color: Colors.blue.shade900)),
-                content: Text('Kode: ${course.code}\nKategori: ${course.category}\nSKS: ${course.credits} SKS'),
+                title: Text(
+                  course.title,
+                  style: TextStyle(color: Colors.blue.shade900),
+                ),
+                content: Text(
+                  'Kode: ${course.code}\nKategori: ${course.category}\nSKS: ${course.credits} SKS',
+                ),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(context),
@@ -578,10 +649,11 @@ class CourseCardWidget extends StatelessWidget {
                     IconButton(
                       icon: Icon(
                         isFav ? Icons.favorite : Icons.favorite_border,
-                        color: isFav ? Colors.blue.shade700 : Colors.blue.shade300,
+                        color: isFav
+                            ? Colors.blue.shade700
+                            : Colors.blue.shade300,
                       ),
                       onPressed: () {
-                        // Tahap 7: context.read digunakan di dalam event handler onPressed
                         context.read<CourseState>().toggleFavorite(course.id);
                       },
                     ),
@@ -609,30 +681,17 @@ class CourseCardWidget extends StatelessWidget {
   }
 }
 
-class CourseDetailPage extends StatefulWidget {
+class CourseDetailPage extends StatelessWidget {
   final Course course;
 
   const CourseDetailPage({super.key, required this.course});
 
   @override
-  State<CourseDetailPage> createState() => _CourseDetailPageState();
-}
-
-class _CourseDetailPageState extends State<CourseDetailPage> {
-  late bool _isFav;
-
-  @override
-  void initState() {
-    super.initState();
-    _isFav = widget.course.isFavorite;
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final isFav = context.watch<CourseState>().isFavorite(course.id);
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.course.title),
-      ),
+      appBar: AppBar(title: Text(course.title)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -655,22 +714,45 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Kode: ${widget.course.code}',
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blue.shade900)),
+                        Text(
+                          'Kode: ${course.code}',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Colors.blue.shade900,
+                          ),
+                        ),
                         Chip(
                           backgroundColor: Colors.blue.shade100,
-                          label: Text('${widget.course.credits} SKS', style: TextStyle(color: Colors.blue.shade900)),
+                          label: Text(
+                            '${course.credits} SKS',
+                            style: TextStyle(color: Colors.blue.shade900),
+                          ),
                         ),
                       ],
                     ),
                     const Divider(height: 24),
-                    Text('Kategori: ${widget.course.category}', style: TextStyle(color: Colors.blue.shade900)),
-                    Text('Tingkat Kesulitan: ${widget.course.level}', style: TextStyle(color: Colors.blue.shade900)),
+                    Text(
+                      'Kategori: ${course.category}',
+                      style: TextStyle(color: Colors.blue.shade900),
+                    ),
+                    Text(
+                      'Tingkat Kesulitan: ${course.level}',
+                      style: TextStyle(color: Colors.blue.shade900),
+                    ),
                     const SizedBox(height: 16),
-                    Text('Deskripsi Mata Kuliah:',
-                        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue.shade900)),
+                    Text(
+                      'Deskripsi Mata Kuliah:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue.shade900,
+                      ),
+                    ),
                     const SizedBox(height: 4),
-                    Text(widget.course.description, style: TextStyle(color: Colors.blue.shade800)),
+                    Text(
+                      course.description,
+                      style: TextStyle(color: Colors.blue.shade800),
+                    ),
                   ],
                 ),
               ),
@@ -681,30 +763,29 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      setState(() {
-                        _isFav = !_isFav;
-                        widget.course.isFavorite = _isFav;
-                      });
+                      context.read<CourseState>().toggleFavorite(course.id);
                     },
-                    icon: Icon(_isFav ? Icons.favorite : Icons.favorite_border),
-                    label: Text(_isFav ? 'Tersimpan di Favorit' : 'Tambah ke Favorit'),
+                    icon: Icon(isFav ? Icons.favorite : Icons.favorite_border),
+                    label: Text(
+                        isFav ? 'Tersimpan di Favorit' : 'Tambah ke Favorit'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: _isFav ? Colors.blue.shade200 : Colors.blue.shade600,
-                      foregroundColor: _isFav ? Colors.blue.shade900 : Colors.white,
+                      backgroundColor: isFav
+                          ? Colors.blue.shade200
+                          : Colors.blue.shade600,
+                      foregroundColor:
+                          isFav ? Colors.blue.shade900 : Colors.white,
                     ),
                   ),
                 ),
                 const SizedBox(width: 12),
                 OutlinedButton.icon(
-                  onPressed: () {
-                    Navigator.pop(context, true);
-                  },
+                  onPressed: () => Navigator.pop(context, true),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.blue.shade800,
                     side: BorderSide(color: Colors.blue.shade600),
                   ),
                   icon: const Icon(Icons.arrow_back),
-                  label: const Text('Simpan & Kembali'),
+                  label: const Text('Kembali'),
                 ),
               ],
             )
@@ -749,13 +830,24 @@ class _ProfileFeedbackPageState extends State<ProfileFeedbackPage> {
       final bool? confirm = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text('Konfirmasi Pengiriman', style: TextStyle(color: Colors.blue.shade900)),
-          content: Text('Apakah Anda yakin ingin mengirim feedback atas nama ${_nameController.text}?'),
+          title: Text(
+            'Konfirmasi Pengiriman',
+            style: TextStyle(color: Colors.blue.shade900),
+          ),
+          content: Text(
+            'Apakah Anda yakin ingin mengirim feedback atas nama ${_nameController.text}?',
+          ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Batal')),
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Batal'),
+            ),
             ElevatedButton(
               onPressed: () => Navigator.pop(context, true),
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue.shade700, foregroundColor: Colors.white),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue.shade700,
+                foregroundColor: Colors.white,
+              ),
               child: const Text('Kirim'),
             ),
           ],
@@ -773,7 +865,9 @@ class _ProfileFeedbackPageState extends State<ProfileFeedbackPage> {
 
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Terima kasih! Feedback dari ${_nameController.text} ($studentId) berhasil dikirim.'),
+              content: Text(
+                'Terima kasih! Feedback dari ${_nameController.text} ($studentId) berhasil dikirim.',
+              ),
               backgroundColor: Colors.blue.shade800,
             ),
           );
@@ -809,18 +903,25 @@ class _ProfileFeedbackPageState extends State<ProfileFeedbackPage> {
                     children: [
                       Text(
                         'Formulir Evaluasi Course Explorer',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blue.shade900),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.blue.shade900,
+                        ),
                       ),
                       const SizedBox(height: 16),
                       TextFormField(
                         controller: _nameController,
                         decoration: InputDecoration(
                           labelText: 'Nama Mahasiswa',
-                          prefixIcon: Icon(Icons.person, color: Colors.blue.shade700),
+                          prefixIcon:
+                              Icon(Icons.person, color: Colors.blue.shade700),
                           border: const OutlineInputBorder(),
                         ),
                         validator: (value) {
-                          if (value == null || value.trim().isEmpty) return 'Nama wajib diisi';
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Nama wajib diisi';
+                          }
                           return null;
                         },
                       ),
@@ -829,11 +930,14 @@ class _ProfileFeedbackPageState extends State<ProfileFeedbackPage> {
                         controller: _idController,
                         decoration: InputDecoration(
                           labelText: 'NIM Mahasiswa',
-                          prefixIcon: Icon(Icons.badge, color: Colors.blue.shade700),
+                          prefixIcon:
+                              Icon(Icons.badge, color: Colors.blue.shade700),
                           border: const OutlineInputBorder(),
                         ),
                         validator: (value) {
-                          if (value == null || value.trim().isEmpty) return 'NIM wajib diisi';
+                          if (value == null || value.trim().isEmpty) {
+                            return 'NIM wajib diisi';
+                          }
                           return null;
                         },
                       ),
@@ -843,7 +947,8 @@ class _ProfileFeedbackPageState extends State<ProfileFeedbackPage> {
                         maxLines: 3,
                         decoration: InputDecoration(
                           labelText: 'Komentar / Feedback Praktikum',
-                          prefixIcon: Icon(Icons.feedback, color: Colors.blue.shade700),
+                          prefixIcon:
+                              Icon(Icons.feedback, color: Colors.blue.shade700),
                           border: const OutlineInputBorder(),
                           hintText: 'Tuliskan masukan minimal 5 karakter...',
                         ),
@@ -871,7 +976,10 @@ class _ProfileFeedbackPageState extends State<ProfileFeedbackPage> {
                                     SizedBox(
                                       width: 20,
                                       height: 20,
-                                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white,
+                                      ),
                                     ),
                                     SizedBox(width: 12),
                                     Text('Mengirim...'),
@@ -911,7 +1019,9 @@ class _DebuggingLabPageState extends State<DebuggingLabPage> {
       MaterialPageRoute(
         builder: (context) => Scaffold(
           appBar: AppBar(title: const Text('Demo Anti-Double Push')),
-          body: const Center(child: Text('Halaman berhasil dibuka dengan aman!')),
+          body: const Center(
+            child: Text('Halaman berhasil dibuka dengan aman!'),
+          ),
         ),
       ),
     );
@@ -934,7 +1044,10 @@ class _DebuggingLabPageState extends State<DebuggingLabPage> {
             const SizedBox(height: 16),
             Text(
               '1. Solusi Row Text Overflow (Expanded Wrapper):',
-              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue.shade900),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.blue.shade900,
+              ),
             ),
             const SizedBox(height: 8),
             Card(
@@ -952,7 +1065,10 @@ class _DebuggingLabPageState extends State<DebuggingLabPage> {
                     Expanded(
                       child: Text(
                         '$studentId - $studentName - Teks yang sangat panjang ini tidak akan memicu RenderFlex Overflow karena telah dibungkus dengan widget Expanded secara tepat.',
-                        style: TextStyle(fontSize: 12, color: Colors.blue.shade900),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.blue.shade900,
+                        ),
                       ),
                     ),
                   ],
@@ -962,7 +1078,10 @@ class _DebuggingLabPageState extends State<DebuggingLabPage> {
             const SizedBox(height: 16),
             Text(
               '2. Solusi Unbounded ListView dalam Column:',
-              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue.shade900),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.blue.shade900,
+              ),
             ),
             const SizedBox(height: 8),
             Card(
@@ -980,8 +1099,15 @@ class _DebuggingLabPageState extends State<DebuggingLabPage> {
                     itemBuilder: (context, index) {
                       return ListTile(
                         dense: true,
-                        leading: Icon(Icons.check_circle, size: 18, color: Colors.blue.shade700),
-                        title: Text('Item Terisolasi ${index + 1}', style: TextStyle(color: Colors.blue.shade900)),
+                        leading: Icon(
+                          Icons.check_circle,
+                          size: 18,
+                          color: Colors.blue.shade700,
+                        ),
+                        title: Text(
+                          'Item Terisolasi ${index + 1}',
+                          style: TextStyle(color: Colors.blue.shade900),
+                        ),
                       );
                     },
                   ),
@@ -991,7 +1117,10 @@ class _DebuggingLabPageState extends State<DebuggingLabPage> {
             const SizedBox(height: 16),
             Text(
               '3. Solusi Mencegah Navigasi Ganda (Double Push Guard):',
-              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue.shade900),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.blue.shade900,
+              ),
             ),
             const SizedBox(height: 8),
             ElevatedButton.icon(
@@ -1001,7 +1130,11 @@ class _DebuggingLabPageState extends State<DebuggingLabPage> {
                 foregroundColor: Colors.white,
               ),
               icon: const Icon(Icons.touch_app),
-              label: Text(_isNavigating ? 'Sedang Membuka...' : 'Uji Proteksi Double Tap Navigation'),
+              label: Text(
+                _isNavigating
+                    ? 'Sedang Membuka...'
+                    : 'Uji Proteksi Double Tap Navigation',
+              ),
             ),
           ],
         ),
