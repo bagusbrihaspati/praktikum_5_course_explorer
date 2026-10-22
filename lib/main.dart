@@ -2,11 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'course_state.dart';
 import 'models/course.dart';
+import 'services/course_service.dart';
 
 const String studentName = 'I Ketut Bagus Brihaspati';
 const String studentId = '2415051090';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Pengujian CourseService (Tahap 9)
+  final courseService = CourseService();
+  try {
+    final loadedCourses = await courseService.loadCourses();
+    debugPrint(
+      '[$studentId - $studentName] Berhasil memuat ${loadedCourses.length} course dari JSON!',
+    );
+  } catch (e) {
+    debugPrint('Error pengujian service: $e');
+  }
+
   runApp(
     ChangeNotifierProvider(
       create: (_) => CourseState(),
