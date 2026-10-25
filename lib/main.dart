@@ -7,6 +7,7 @@ import 'screens/debugging_lab_page.dart';
 import 'screens/home_page.dart';
 import 'screens/profile_feedback_page.dart';
 import 'services/course_service.dart';
+import 'screens/favorites_page.dart';
 
 const String studentName = 'I Ketut Bagus Brihaspati';
 const String studentId = '2415051090';
@@ -68,6 +69,7 @@ class _MainAdaptiveShellState extends State<MainAdaptiveShell> {
   final List<Widget> _pages = const [
     HomePage(),
     CoursesPage(),
+    FavoritesPage(), // Tahap 13: Tab baru khusus menampilkan mata kuliah favorit
     ProfileFeedbackPage(),
     DebuggingLabPage(),
   ];
@@ -98,6 +100,11 @@ class _MainAdaptiveShellState extends State<MainAdaptiveShell> {
                   icon: Icon(Icons.school_outlined, color: Colors.blue.shade900),
                   selectedIcon: Icon(Icons.school, color: Colors.blue.shade900),
                   label: 'Courses',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.favorite_border, color: Colors.blue.shade900),
+                  selectedIcon: Icon(Icons.favorite, color: Colors.blue.shade900),
+                  label: 'Favorites',
                 ),
                 NavigationDestination(
                   icon: Icon(Icons.person_outlined, color: Colors.blue.shade900),
@@ -141,6 +148,11 @@ class _MainAdaptiveShellState extends State<MainAdaptiveShell> {
                       icon: Icon(Icons.school_outlined),
                       selectedIcon: Icon(Icons.school),
                       label: Text('Courses'),
+                    ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.favorite_border),
+                      selectedIcon: Icon(Icons.favorite),
+                      label: Text('Favorites'),
                     ),
                     NavigationRailDestination(
                       icon: Icon(Icons.person_outlined),
