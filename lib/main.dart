@@ -1,32 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'course_state.dart';
 import 'models/course.dart';
-import 'services/course_service.dart';
+import 'providers/course_provider.dart';
 import 'repositories/course_repository.dart';
+import 'services/course_service.dart';
 
 const String studentName = 'I Ketut Bagus Brihaspati';
 const String studentId = '2415051090';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Pengujian Repository Pattern (Tahap 10)
   final courseService = CourseService();
   final courseRepository = CourseRepository(courseService);
 
-  try {
-    final courses = await courseRepository.getCourses();
-    debugPrint(
-      '[$studentId - $studentName] Repository berhasil mengambil ${courses.length} courses melalui CourseService!',
-    );
-  } catch (e) {
-    debugPrint('Error pengujian repository: $e');
-  }
-
   runApp(
     ChangeNotifierProvider(
-      create: (_) => CourseState(),
+      create: (_) => CourseProvider(courseRepository)..loadCourses(),
       child: const CourseExplorerApp(),
     ),
   );
@@ -61,76 +51,6 @@ class CourseExplorerApp extends StatelessWidget {
     );
   }
 }
-
-// Dummy Courses menggunakan Model Course & factory fromJson (Tahap 8)
-final List<Course> dummyCourses = [
-  Course.fromJson({
-    'id': '1',
-    'code': 'MOB04',
-    'title': 'Pemrograman Flutter',
-    'credits': 3,
-    'category': 'Mobile',
-    'level': 'Beginner',
-    'description':
-        'Mempelajari dasar-dasar UI Flutter, Widget, Layouting, State Management, dan Navigasi.',
-    'status': 'done',
-  }),
-  Course(
-    id: '2',
-    code: 'WEB02',
-    title: 'Pengembangan Web Laravel',
-    credits: 3,
-    category: 'Web',
-    level: 'Intermediate',
-    description:
-        'Membangun aplikasi web modern menggunakan Framework PHP Laravel dan RESTful API.',
-    status: 'done',
-  ),
-  Course(
-    id: '3',
-    code: 'NET01',
-    title: 'Jaringan Komputer',
-    credits: 3,
-    category: 'Network',
-    level: 'Advanced',
-    description:
-        'Konfigurasi IP Addressing, Routing OSPF/BGP, VLAN, dan analisis heatmap Wi-Fi.',
-    status: 'done',
-  ),
-  Course(
-    id: '4',
-    code: 'MUL03',
-    title: 'Pengolahan Citra Digital',
-    credits: 2,
-    category: 'Multimedia',
-    level: 'Intermediate',
-    description:
-        'Pembelajaran operasi piksel, transformasi geometris, kuantisasi, dan ruang warna YCbCr.',
-    status: 'active',
-  ),
-  Course(
-    id: '5',
-    code: 'AI01',
-    title: 'Kecerdasan Buatan',
-    credits: 3,
-    category: 'AI',
-    level: 'Advanced',
-    description:
-        'Studi Inferensi Logika Fuzzy Sugeno, Teori Keputusan, Bayes, dan algoritma DFS/BFS.',
-    status: 'active',
-  ),
-  Course(
-    id: '6',
-    code: 'DES01',
-    title: 'Desain UI/UX',
-    credits: 2,
-    category: 'Design',
-    level: 'Beginner',
-    description:
-        'Prinsip Design Thinking, pembuatan wireframe, prototyping, dan analisis kegunaan sistem.',
-    status: 'active',
-  ),
-];
 
 class MainAdaptiveShell extends StatefulWidget {
   const MainAdaptiveShell({super.key});
@@ -520,14 +440,9 @@ class CoursesSummary extends StatelessWidget {
   }
 }
 
-class CoursesPage extends StatefulWidget {
+class CoursesPage extends StatelessWidget {
   const CoursesPage({super.key});
 
-  @override
-  State<CoursesPage> createState() => _CoursesPageState();
-}
-
-class _CoursesPageState extends State<CoursesPage> {
   int _getCrossAxisCount(double width) {
     if (width < 600) return 1;
     if (width < 840) return 2;
@@ -536,6 +451,9 @@ class _CoursesPageState extends State<CoursesPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Membaca state dari CourseProvider
+    final courseProvider = context.watch<CourseProvider>();
+
     return Scaffold(
       appBar: AppBar(title: const Text('Daftar Mata Kuliah')),
       body: LayoutBuilder(
@@ -549,37 +467,89 @@ class _CoursesPageState extends State<CoursesPage> {
               children: [
                 const StudentHeaderCard(),
                 const SizedBox(height: 12),
-                Consumer<CourseState>(
-                  builder: (context, courseState, child) {
-                    return CoursesSummary(
-                      totalFavorites: courseState.totalFavorites,
-                      onClearAll: () =>
-                          context.read<CourseState>().clearAllFavorites(),
-                    );
-                  },
+                CoursesSummary(
+                  totalFavorites: courseProvider.totalFavorites,
+                  onClearAll: () =>
+                      context.read<CourseProvider>().clearAllFavorites(),
                 ),
                 const SizedBox(height: 12),
-                Text(
-                  'Katalog Course (${dummyCourses.length} Item - Grid $columns Kolom):',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue.shade900,
-                    fontSize: 16,
-                  ),
-                ),
-                const SizedBox(height: 8),
+
+                // Penanganan Async State (Loading, Error, Success)
                 Expanded(
-                  child: GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: columns,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                      childAspectRatio: constraints.maxWidth < 600 ? 2.3 : 1.8,
-                    ),
-                    itemCount: dummyCourses.length,
-                    itemBuilder: (context, index) {
-                      final course = dummyCourses[index];
-                      return CourseCardWidget(course: course);
+                  child: Builder(
+                    builder: (context) {
+                      // 1. Loading State
+                      if (courseProvider.isLoading) {
+                        return const Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              CircularProgressIndicator(),
+                              SizedBox(height: 12),
+                              Text('Memuat data mata kuliah dari JSON...'),
+                            ],
+                          ),
+                        );
+                      }
+
+                      // 2. Error State
+                      if (courseProvider.error != null) {
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.error_outline,
+                                  color: Colors.red.shade700, size: 48),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Terjadi kesalahan:\n${courseProvider.error}',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(color: Colors.red.shade900),
+                              ),
+                              const SizedBox(height: 12),
+                              ElevatedButton.icon(
+                                onPressed: () =>
+                                    context.read<CourseProvider>().loadCourses(),
+                                icon: const Icon(Icons.refresh),
+                                label: const Text('Coba Lagi'),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+
+                      // 3. Success State
+                      final courses = courseProvider.courses;
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Katalog Course (${courses.length} Item - Grid $columns Kolom):',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blue.shade900,
+                              fontSize: 16,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Expanded(
+                            child: GridView.builder(
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: columns,
+                                crossAxisSpacing: 12,
+                                mainAxisSpacing: 12,
+                                childAspectRatio:
+                                    constraints.maxWidth < 600 ? 2.3 : 1.8,
+                              ),
+                              itemCount: courses.length,
+                              itemBuilder: (context, index) {
+                                return CourseCardWidget(course: courses[index]);
+                              },
+                            ),
+                          ),
+                        ],
+                      );
                     },
                   ),
                 ),
@@ -602,7 +572,7 @@ class CourseCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isFav = context.watch<CourseState>().isFavorite(course.id);
+    final isFav = context.watch<CourseProvider>().isFavorite(course.id);
 
     return Card(
       elevation: 1,
@@ -671,7 +641,7 @@ class CourseCardWidget extends StatelessWidget {
                             : Colors.blue.shade300,
                       ),
                       onPressed: () {
-                        context.read<CourseState>().toggleFavorite(course.id);
+                        context.read<CourseProvider>().toggleFavorite(course.id);
                       },
                     ),
                   ],
@@ -705,7 +675,7 @@ class CourseDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isFav = context.watch<CourseState>().isFavorite(course.id);
+    final isFav = context.watch<CourseProvider>().isFavorite(course.id);
 
     return Scaffold(
       appBar: AppBar(title: Text(course.title)),
@@ -780,7 +750,7 @@ class CourseDetailPage extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      context.read<CourseState>().toggleFavorite(course.id);
+                      context.read<CourseProvider>().toggleFavorite(course.id);
                     },
                     icon: Icon(isFav ? Icons.favorite : Icons.favorite_border),
                     label: Text(
