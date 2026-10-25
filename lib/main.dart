@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'course_state.dart';
 import 'models/course.dart';
 import 'services/course_service.dart';
+import 'repositories/course_repository.dart';
 
 const String studentName = 'I Ketut Bagus Brihaspati';
 const String studentId = '2415051090';
@@ -10,15 +11,17 @@ const String studentId = '2415051090';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Pengujian CourseService (Tahap 9)
+  // Pengujian Repository Pattern (Tahap 10)
   final courseService = CourseService();
+  final courseRepository = CourseRepository(courseService);
+
   try {
-    final loadedCourses = await courseService.loadCourses();
+    final courses = await courseRepository.getCourses();
     debugPrint(
-      '[$studentId - $studentName] Berhasil memuat ${loadedCourses.length} course dari JSON!',
+      '[$studentId - $studentName] Repository berhasil mengambil ${courses.length} courses melalui CourseService!',
     );
   } catch (e) {
-    debugPrint('Error pengujian service: $e');
+    debugPrint('Error pengujian repository: $e');
   }
 
   runApp(
