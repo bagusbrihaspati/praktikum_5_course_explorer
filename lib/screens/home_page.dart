@@ -1,154 +1,211 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/course_provider.dart';
 import '../widgets/student_header_card.dart';
+
+const String studentName = 'I Ketut Bagus Brihaspati';
+const String studentId = '2415051090';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final orientation = MediaQuery.of(context).orientation;
-
-    final List<String> skills = [
-      'Flutter',
-      'Dart',
-      'Laravel',
-      'PHP',
-      'UI/UX Design',
-      'Computer Network',
-      'Digital Image Processing',
-      'Git & GitHub'
-    ];
+    final courseProvider = context.watch<CourseProvider>();
+    final courses = courseProvider.courses;
+    final totalCourses = courses.length;
+    final totalFavorites = courseProvider.totalFavorites;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Course Explorer - Home')),
+      appBar: AppBar(
+        title: const Text('Course Explorer v2'),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const StudentHeaderCard(),
-            const SizedBox(height: 16),
+            // 1. Identitas Mahasiswa
             Card(
-              elevation: 1,
-              color: Colors.white,
+              elevation: 0,
+              color: Colors.blue.shade50,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
-                side: BorderSide(color: Colors.blue.shade200),
+                side: BorderSide(color: Colors.blue.shade100),
               ),
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+                child: Row(
                   children: [
-                    Text(
-                      'Informasi Lingkungan Layar (MediaQuery):',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue.shade900,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                        'Width: ${size.width.toStringAsFixed(0)} px | Height: ${size.height.toStringAsFixed(0)} px'),
-                    Text('Orientation: ${orientation.name}'),
-                    const SizedBox(height: 8),
-                    Chip(
-                      label: Text(
-                        size.width < 600
-                            ? 'Mode: Compact (< 600px)'
-                            : 'Mode: Wide (>= 600px)',
+                    Icon(Icons.badge_outlined, color: Colors.blue.shade900),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        '$studentId • $studentName',
                         style: TextStyle(
+                          fontSize: 15,
                           fontWeight: FontWeight.bold,
                           color: Colors.blue.shade900,
                         ),
                       ),
-                      backgroundColor: size.width < 600
-                          ? Colors.blue.shade100
-                          : Colors.lightBlue.shade100,
-                    )
+                    ),
                   ],
                 ),
               ),
             ),
             const SizedBox(height: 16),
-            Text(
-              'Demo Proportion Flex Layout (2 : 1):',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.blue.shade900,
-              ),
-            ),
-            const SizedBox(height: 8),
+
+            // 2. Statistik Metrics (Courses & Favorites)
             Row(
               children: [
                 Expanded(
-                  flex: 2,
-                  child: Container(
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: Colors.blue.shade600,
-                      borderRadius: BorderRadius.circular(8),
+                  child: Card(
+                    elevation: 0,
+                    color: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: Colors.blue.shade200),
                     ),
-                    alignment: Alignment.center,
-                    child: const Text(
-                      'Flex 2',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Courses',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.blue.shade700,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            courseProvider.isLoading ? '...' : '$totalCourses',
+                            style: TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blue.shade900,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 12),
                 Expanded(
-                  flex: 1,
-                  child: Container(
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: Colors.blue.shade300,
-                      borderRadius: BorderRadius.circular(8),
+                  child: Card(
+                    elevation: 0,
+                    color: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: Colors.blue.shade200),
                     ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Flex 1',
-                      style: TextStyle(
-                        color: Colors.blue.shade900,
-                        fontWeight: FontWeight.bold,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Favorites',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.blue.shade700,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            '$totalFavorites',
+                            style: TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blue.shade900,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
+
+            // 3. Status Progress / List Mata Kuliah
             Text(
-              'Keterampilan Utama (Wrap Widget):',
+              'Status Ketercapaian Mata Kuliah:',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
+                fontSize: 15,
                 color: Colors.blue.shade900,
               ),
             ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8.0,
-              runSpacing: 8.0,
-              children: skills.map((skill) {
-                return Chip(
-                  backgroundColor: Colors.blue.shade50,
-                  side: BorderSide(color: Colors.blue.shade200),
-                  avatar: Icon(
-                    Icons.check_circle_outline,
-                    size: 16,
-                    color: Colors.blue.shade700,
+            const SizedBox(height: 10),
+
+            if (courseProvider.isLoading)
+              const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(24.0),
+                  child: CircularProgressIndicator(),
+                ),
+              )
+            else if (courseProvider.error != null)
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    'Gagal memuat status mata kuliah.',
+                    style: TextStyle(color: Colors.red.shade800),
                   ),
-                  label: Text(
-                    skill,
-                    style: TextStyle(color: Colors.blue.shade900),
-                  ),
-                );
-              }).toList(),
-            ),
+                ),
+              )
+            else
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: courses.length,
+                itemBuilder: (context, index) {
+                  final course = courses[index];
+                  final bool isDone = course.status.toLowerCase() == 'done';
+
+                  return Card(
+                    elevation: 0,
+                    color: Colors.white,
+                    margin: const EdgeInsets.only(bottom: 12.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: Colors.blue.shade200),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            course.title,
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blue.shade900,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            course.status,
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: isDone ? Colors.green.shade700 : Colors.blue.shade800,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
           ],
         ),
       ),
