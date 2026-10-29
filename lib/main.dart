@@ -8,12 +8,35 @@ import 'screens/home_page.dart';
 import 'screens/profile_feedback_page.dart';
 import 'services/course_service.dart';
 import 'screens/favorites_page.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 const String studentName = 'I Ketut Bagus Brihaspati';
 const String studentId = '2415051090';
 
-void main() {
+const String apiUrl = 'https://jsonplaceholder.typicode.com/posts';
+
+Future<List<dynamic>> fetchCourses() async {
+  final response = await http.get(Uri.parse(apiUrl));
+
+  if (response.statusCode == 200) {
+    return jsonDecode(response.body) as List<dynamic>;
+  }
+
+  throw Exception('HTTP ${response.statusCode}');
+}
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Pengujian Tahap 2: Panggil GET melalui function asynchronous
+  debugPrint('[$studentId - $studentName] Menguji HTTP GET ke endpoint...');
+  try {
+    final items = await fetchCourses();
+    debugPrint('[$studentId - $studentName] Berhasil mengambil ${items.length} item dari API!');
+  } catch (e) {
+    debugPrint('[$studentId - $studentName] Terjadi kesalahan: $e');
+  }
 
   final courseService = CourseService();
   final courseRepository = CourseRepository(courseService);
