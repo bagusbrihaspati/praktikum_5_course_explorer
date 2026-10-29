@@ -3,6 +3,10 @@ import 'package:provider/provider.dart';
 import '../providers/course_provider.dart';
 import '../widgets/course_card.dart';
 import '../widgets/student_header_card.dart';
+import '../widgets/error_view.dart';
+
+const String studentName = 'I Ketut Bagus Brihaspati';
+const String studentId = '2415051090';
 
 class CoursesSummary extends StatelessWidget {
   final int totalFavorites;
@@ -81,44 +85,30 @@ class CoursesPage extends StatelessWidget {
                 Expanded(
                   child: Builder(
                     builder: (context) {
+                      // 1. Loading State -> progress indicator
                       if (courseProvider.isLoading) {
                         return const Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              CircularProgressIndicator(),
-                              SizedBox(height: 12),
-                              Text('Memuat data mata kuliah dari JSON...'),
-                            ],
-                          ),
+                          child: CircularProgressIndicator(),
                         );
                       }
 
+                      // 2. Error State -> ErrorView dengan tombol retry
                       if (courseProvider.error != null) {
-                        return Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.error_outline,
-                                  color: Colors.red.shade700, size: 48),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Terjadi kesalahan:\n${courseProvider.error}',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(color: Colors.red.shade900),
-                              ),
-                              const SizedBox(height: 12),
-                              ElevatedButton.icon(
-                                onPressed: () =>
-                                    context.read<CourseProvider>().loadCourses(),
-                                icon: const Icon(Icons.refresh),
-                                label: const Text('Coba Lagi'),
-                              ),
-                            ],
-                          ),
+                        return ErrorView(
+                          message: courseProvider.error!,
+                          onRetry: () =>
+                              context.read<CourseProvider>().loadCourses(),
                         );
                       }
 
+                      // 3. Empty State -> Pesan data belum tersedia
+                      if (courseProvider.courses.isEmpty) {
+                        return const Center(
+                          child: Text('Data course belum tersedia'),
+                        );
+                      }
+
+                      // 4. Success State -> Menampilkan data katalog grid course
                       final courses = courseProvider.courses;
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

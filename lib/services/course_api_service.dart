@@ -12,8 +12,8 @@ class CourseApiService {
 
   Future<List<Course>> getCourses() async {
     final url = baseUrl.endsWith('/posts') || baseUrl.endsWith('/courses')
-        ? baseUrl
-        : '$baseUrl/courses';
+    ? baseUrl
+    : '$baseUrl/courses';
 
     final response = await http.get(Uri.parse(url));
 
