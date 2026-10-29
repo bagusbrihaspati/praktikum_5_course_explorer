@@ -4,6 +4,7 @@ import '../providers/course_provider.dart';
 import '../widgets/course_card.dart';
 import '../widgets/student_header_card.dart';
 import '../widgets/error_view.dart';
+import 'add_course_page.dart';
 
 const String studentName = 'I Ketut Bagus Brihaspati';
 const String studentId = '2415051090';
@@ -85,14 +86,12 @@ class CoursesPage extends StatelessWidget {
                 Expanded(
                   child: Builder(
                     builder: (context) {
-                      // 1. Loading State -> progress indicator
                       if (courseProvider.isLoading) {
                         return const Center(
                           child: CircularProgressIndicator(),
                         );
                       }
 
-                      // 2. Error State -> ErrorView dengan tombol retry
                       if (courseProvider.error != null) {
                         return ErrorView(
                           message: courseProvider.error!,
@@ -101,14 +100,12 @@ class CoursesPage extends StatelessWidget {
                         );
                       }
 
-                      // 3. Empty State -> Pesan data belum tersedia
                       if (courseProvider.courses.isEmpty) {
                         return const Center(
                           child: Text('Data course belum tersedia'),
                         );
                       }
 
-                      // 4. Success State -> Menampilkan data katalog grid course
                       final courses = courseProvider.courses;
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -147,6 +144,17 @@ class CoursesPage extends StatelessWidget {
             ),
           );
         },
+      ),
+      // Tombol Tambah Course (Langkah 5)
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const AddCoursePage()),
+          );
+        },
+        icon: const Icon(Icons.add),
+        label: const Text('Tambah Course'),
       ),
     );
   }

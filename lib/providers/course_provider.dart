@@ -19,6 +19,18 @@ class CourseProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+Future<bool> createCourse(Course course) async {
+    try {
+      await repository.createCourse(course);
+      await loadCourses(); // Instruksi 40: Refresh list setelah berhasil
+      return true;
+    } catch (e) {
+      error = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
+
   final Set<String> _favorites = {};
   Set<String> get favorites => Set.unmodifiable(_favorites);
   int get totalFavorites => _favorites.length;
