@@ -14,7 +14,9 @@ class CourseCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isFav = context.watch<CourseProvider>().isFavorite(course.id);
+    // Konversi id ke String agar sesuai dengan Set<String> di CourseProvider
+    final courseIdStr = course.id.toString();
+    final isFav = context.watch<CourseProvider>().isFavorite(courseIdStr);
 
     return Card(
       elevation: 1,
@@ -83,7 +85,7 @@ class CourseCardWidget extends StatelessWidget {
                             : Colors.blue.shade300,
                       ),
                       onPressed: () {
-                        context.read<CourseProvider>().toggleFavorite(course.id);
+                        context.read<CourseProvider>().toggleFavorite(courseIdStr);
                       },
                     ),
                   ],

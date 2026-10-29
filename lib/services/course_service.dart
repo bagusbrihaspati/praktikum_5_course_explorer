@@ -6,7 +6,7 @@ const String studentName = 'I Ketut Bagus Brihaspati';
 const String studentId = '2415051090';
 
 class CourseService {
-  /// Membaca file JSON asset dan mengembalikannya sebagai List<Course>
+
   Future<List<Course>> loadCourses() async {
     try {
       final jsonString = await rootBundle.loadString(

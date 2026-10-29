@@ -1,17 +1,15 @@
 import '../models/course.dart';
-import '../services/course_service.dart';
+import '../services/course_api_service.dart';
 
 const String studentName = 'I Ketut Bagus Brihaspati';
 const String studentId = '2415051090';
 
 class CourseRepository {
-  final CourseService service;
+  final CourseApiService _apiService;
 
-  // Menerima CourseService melalui constructor (Dependency Injection)
-  CourseRepository(this.service);
+  CourseRepository(this._apiService);
 
-  /// Mengambil daftar mata kuliah dari service data source
-  Future<List<Course>> getCourses() {
-    return service.loadCourses();
+  Future<List<Course>> getCourses() async {
+    return await _apiService.getCourses();
   }
 }

@@ -6,11 +6,11 @@ import 'screens/courses_page.dart';
 import 'screens/debugging_lab_page.dart';
 import 'screens/home_page.dart';
 import 'screens/profile_feedback_page.dart';
-import 'services/course_service.dart';
 import 'screens/favorites_page.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'models/course.dart';
+import 'services/course_api_service.dart';
 
 const String studentName = 'I Ketut Bagus Brihaspati';
 const String studentId = '2415051090';
@@ -31,21 +31,9 @@ Future<List<Course>> fetchCourses() async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Pengujian Tahap 3: Konversi response list menjadi List<Course>
-  debugPrint('[$studentId - $studentName] Menguji konversi List<Course>...');
-  try {
-    final courses = await fetchCourses();
-    debugPrint('[$studentId - $studentName] Berhasil konversi ${courses.length} Course!');
-    // Instruksi 22: Tampilkan code, title, dan status minimal tiga course
-    for (var i = 0; i < 3 && i < courses.length; i++) {
-      debugPrint('-> [${courses[i].code}] ${courses[i].title} (${courses[i].status})');
-    }
-  } catch (e) {
-    debugPrint('[$studentId - $studentName] Gagal parsing Course: $e');
-  }
-
-  final courseService = CourseService();
-  final courseRepository = CourseRepository(courseService);
+  final courseApiService =
+      CourseApiService('https://jsonplaceholder.typicode.com/posts');
+  final courseRepository = CourseRepository(courseApiService);
 
   runApp(
     ChangeNotifierProvider(

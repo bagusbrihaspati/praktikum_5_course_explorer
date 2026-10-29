@@ -2,7 +2,7 @@ const String studentName = 'I Ketut Bagus Brihaspati';
 const String studentId = '2415051090';
 
 class Course {
-  final dynamic id; // int? dari REST API atau String dari project sebelumnya
+  final dynamic id;
   final String code;
   final String title;
   final int credits;
@@ -19,20 +19,16 @@ class Course {
     this.category = 'General',
     this.level = 'Beginner',
     this.description = '',
-    this.status = 'planned', // Nilai default 'planned' sesuai instruksi nomor 19
+    this.status = 'planned',
   });
 
-  // Getter bantu jika membutuhkan id bertipe int murni
-  int? get numericId {
-    if (id is int) return id as int;
-    if (id is String) return int.tryParse(id as String);
-    return null;
-  }
+  // Getter pembantu
+  String get idString => id?.toString() ?? code;
 
-  // Factory constructor konversi JSON Map ke objek Course
   factory Course.fromJson(Map<String, dynamic> json) {
     return Course(
-      id: json['id'],
+      // Konversi id langsung ke String agar aman dipakai di UI/Widget
+      id: json['id']?.toString() ?? json['code']?.toString() ?? '',
       code: (json['code'] as String?) ?? 'MOB${json['id'] ?? 0}',
       title: (json['title'] as String?) ?? 'Untitled Course',
       credits: json['credits'] is int
@@ -45,7 +41,6 @@ class Course {
     );
   }
 
-  // Method serialisasi dari Course ke Map JSON sesuai instruksi nomor 18
   Map<String, dynamic> toJson() => {
         if (id != null) 'id': id,
         'code': code,
