@@ -10,17 +10,19 @@ import 'services/course_service.dart';
 import 'screens/favorites_page.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'models/course.dart';
 
 const String studentName = 'I Ketut Bagus Brihaspati';
 const String studentId = '2415051090';
 
 const String apiUrl = 'https://jsonplaceholder.typicode.com/posts';
 
-Future<List<dynamic>> fetchCourses() async {
+Future<List<Course>> fetchCourses() async {
   final response = await http.get(Uri.parse(apiUrl));
 
   if (response.statusCode == 200) {
-    return jsonDecode(response.body) as List<dynamic>;
+    final List<dynamic> data = jsonDecode(response.body);
+    return data.map((item) => Course.fromJson(item as Map<String, dynamic>)).toList();
   }
 
   throw Exception('HTTP ${response.statusCode}');
@@ -29,13 +31,17 @@ Future<List<dynamic>> fetchCourses() async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Pengujian Tahap 2: Panggil GET melalui function asynchronous
-  debugPrint('[$studentId - $studentName] Menguji HTTP GET ke endpoint...');
+  // Pengujian Tahap 3: Konversi response list menjadi List<Course>
+  debugPrint('[$studentId - $studentName] Menguji konversi List<Course>...');
   try {
-    final items = await fetchCourses();
-    debugPrint('[$studentId - $studentName] Berhasil mengambil ${items.length} item dari API!');
+    final courses = await fetchCourses();
+    debugPrint('[$studentId - $studentName] Berhasil konversi ${courses.length} Course!');
+    // Instruksi 22: Tampilkan code, title, dan status minimal tiga course
+    for (var i = 0; i < 3 && i < courses.length; i++) {
+      debugPrint('-> [${courses[i].code}] ${courses[i].title} (${courses[i].status})');
+    }
   } catch (e) {
-    debugPrint('[$studentId - $studentName] Terjadi kesalahan: $e');
+    debugPrint('[$studentId - $studentName] Gagal parsing Course: $e');
   }
 
   final courseService = CourseService();

@@ -74,10 +74,12 @@ class _DebuggingLabPageState extends State<DebuggingLabPage> {
     }
   }
 
-  // Kasus C: Uji memicu error state pada Provider
+
+// Kasus C: Uji memicu error state pada Provider
   void _triggerSimulatedError() {
-    context.read<CourseProvider>().error = 'Simulasi kegagalan membaca data asset JSON.';
-    context.read<CourseProvider>().notifyListeners();
+    context.read<CourseProvider>().triggerSimulatedError(
+      'Simulasi kegagalan membaca data REST API.',
+    );
     setState(() {
       _debugLog = 'Kasus C: Error state berhasil dipicu ke CourseProvider. Cek halaman Courses!';
     });

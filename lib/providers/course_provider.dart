@@ -10,12 +10,15 @@ class CourseProvider extends ChangeNotifier {
 
   CourseProvider(this.repository);
 
-  // Async State
   List<Course> courses = [];
   bool isLoading = false;
   String? error;
+  
+  void triggerSimulatedError(String message) {
+    error = message; 
+    notifyListeners();
+  }
 
-  // Shared State: ID mata kuliah favorit
   final Set<String> _favorites = {};
   Set<String> get favorites => Set.unmodifiable(_favorites);
   int get totalFavorites => _favorites.length;
