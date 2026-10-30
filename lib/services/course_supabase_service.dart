@@ -43,7 +43,6 @@ class CourseSupabaseService implements CourseDataSource {
 
 @override
   Future<void> updateCourse(dynamic id, Course course) async {
-    // Siapkan payload yang hanya memuat kolom tabel database Supabase
     final payload = <String, dynamic>{
       'code': course.code,
       'title': course.title,
@@ -54,13 +53,18 @@ class CourseSupabaseService implements CourseDataSource {
           : 'planned',
     };
 
-    // Instruksi 83: Eksekusi update berdasarkan ID
     await supabase
         .from('courses')
         .update(payload)
         .eq('id', id);
   }
 
-  @override
-  Future<void> deleteCourse(dynamic id) => throw UnimplementedError();
+@override
+  Future<void> deleteCourse(dynamic id) async {
+    // Instruksi 87: Eksekusi DELETE berdasarkan ID pada tabel courses
+    await supabase
+        .from('courses')
+        .delete()
+        .eq('id', id);
+  }
 }
