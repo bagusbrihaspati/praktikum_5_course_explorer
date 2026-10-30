@@ -46,4 +46,22 @@ class CourseApiService {
 
     throw Exception('Gagal membuat course: HTTP ${response.statusCode}');
   }
+
+  Future<void> updateCourse(dynamic id, Course course) async {
+    // Endpoint REST API PUT: sesuaikan dengan struktur URL (misal: /posts/1 atau /courses/1)
+    final root = baseUrl.endsWith('/posts') || baseUrl.endsWith('/courses')
+        ? baseUrl
+        : '$baseUrl/courses';
+    final url = '$root/$id';
+
+    final response = await http.put(
+      Uri.parse(url),
+      headers: {'Content-Type': 'application/json; charset=UTF-8'},
+      body: jsonEncode(course.toJson()),
+    );
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw Exception('Gagal memperbarui course: HTTP ${response.statusCode}');
+    }
+  }
 }

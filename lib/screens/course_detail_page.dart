@@ -3,6 +3,10 @@ import 'package:provider/provider.dart';
 import '../models/course.dart';
 import '../providers/course_provider.dart';
 import '../widgets/student_header_card.dart';
+import 'edit_course_page.dart';
+
+const String studentName = 'I Ketut Bagus Brihaspati';
+const String studentId = '2415051090';
 
 class CourseDetailPage extends StatelessWidget {
   final Course course;
@@ -11,10 +15,33 @@ class CourseDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isFav = context.watch<CourseProvider>().isFavorite(course.id);
+    // Amankan id ke String untuk pengecekan favorite
+    final courseIdStr = course.id.toString();
+    final isFav = context.watch<CourseProvider>().isFavorite(courseIdStr);
 
     return Scaffold(
-      appBar: AppBar(title: Text(course.title)),
+      appBar: AppBar(
+        title: Text(course.title),
+        // Tombol Edit Course (Instruksi No. 41)
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit),
+            tooltip: 'Edit Course',
+            onPressed: () async {
+              final result = await Navigator.push<bool>(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => EditCoursePage(course: course),
+                ),
+              );
+              // Jika berhasil diedit, kembali ke katalog dan refresh list
+              if (result == true && context.mounted) {
+                Navigator.pop(context, true);
+              }
+            },
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -86,7 +113,7 @@ class CourseDetailPage extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      context.read<CourseProvider>().toggleFavorite(course.id);
+                      context.read<CourseProvider>().toggleFavorite(courseIdStr);
                     },
                     icon: Icon(isFav ? Icons.favorite : Icons.favorite_border),
                     label: Text(

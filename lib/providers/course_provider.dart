@@ -67,4 +67,16 @@ Future<bool> createCourse(Course course) async {
       notifyListeners();
     }
   }
+
+  Future<bool> updateCourse(dynamic id, Course course) async {
+    try {
+      await repository.updateCourse(id, course);
+      await loadCourses(); // Instruksi 45: Refresh data dan tampilkan hasil
+      return true;
+    } catch (e) {
+      error = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
 }
