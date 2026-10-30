@@ -79,4 +79,28 @@ Future<bool> createCourse(Course course) async {
       return false;
     }
   }
+
+  Future<bool> deleteCourse(dynamic id, String courseCode) async {
+    try {
+      await repository.deleteCourse(id);
+
+      // Instruksi 51: Hapus dari daftar favorit jika ada agar tidak jadi data yatim
+      final idStr = id.toString();
+      if (isFavorite(idStr)) {
+        toggleFavorite(idStr);
+      } else if (isFavorite(courseCode)) {
+        toggleFavorite(courseCode);
+      }
+
+      // Instruksi 49: Hapus course dari list katalog lokal dan perbarui UI
+      courses.removeWhere((c) => c.id.toString() == idStr || c.code == courseCode);
+      notifyListeners();
+
+      return true;
+    } catch (e) {
+      error = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
 }

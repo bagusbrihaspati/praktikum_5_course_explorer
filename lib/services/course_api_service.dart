@@ -64,4 +64,17 @@ class CourseApiService {
       throw Exception('Gagal memperbarui course: HTTP ${response.statusCode}');
     }
   }
+
+  Future<void> deleteCourse(dynamic id) async {
+    final root = baseUrl.endsWith('/posts') || baseUrl.endsWith('/courses')
+        ? baseUrl
+        : '$baseUrl/courses';
+    final url = '$root/$id';
+
+    final response = await http.delete(Uri.parse(url));
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw Exception('Gagal menghapus course: HTTP ${response.statusCode}');
+    }
+  }
 }

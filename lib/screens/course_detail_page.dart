@@ -22,8 +22,8 @@ class CourseDetailPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(course.title),
-        // Tombol Edit Course (Instruksi No. 41)
         actions: [
+          // 1. Tombol Edit Course (Instruksi No. 41)
           IconButton(
             icon: const Icon(Icons.edit),
             tooltip: 'Edit Course',
@@ -37,6 +37,71 @@ class CourseDetailPage extends StatelessWidget {
               // Jika berhasil diedit, kembali ke katalog dan refresh list
               if (result == true && context.mounted) {
                 Navigator.pop(context, true);
+              }
+            },
+          ),
+
+          // 2. Tombol Delete Course (Instruksi No. 46, 47, 48, 49, 50, 51)
+          IconButton(
+            icon: const Icon(Icons.delete, color: Colors.red),
+            tooltip: 'Hapus Course',
+            onPressed: () async {
+              // Instruksi 47: Tampilkan AlertDialog konfirmasi sebelum menghapus
+              final confirm = await showDialog<bool>(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: const Text('Konfirmasi Hapus'),
+                  content: Text(
+                    'Yakin ingin menghapus mata kuliah ${course.title}?',
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx, false),
+                      child: const Text('Batal'),
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                      ),
+                      onPressed: () => Navigator.pop(ctx, true),
+                      child: const Text(
+                        'Hapus',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+
+              // Instruksi 48: Jalankan DELETE setelah user menyetujui
+              if (confirm == true) {
+                if (!context.mounted) return;
+                final provider = context.read<CourseProvider>();
+                final success = await provider.deleteCourse(
+                  course.id,
+                  course.code,
+                );
+
+                // Instruksi 50: Periksa context.mounted sebelum memakai context
+                if (!context.mounted) return;
+
+                if (success) {
+                  // Instruksi 49: Refresh list dan tampilkan SnackBar
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Course berhasil dihapus!'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                  Navigator.pop(context, true);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Gagal menghapus: ${provider.error}'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
               }
             },
           ),
@@ -113,11 +178,14 @@ class CourseDetailPage extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      context.read<CourseProvider>().toggleFavorite(courseIdStr);
+                      context
+                          .read<CourseProvider>()
+                          .toggleFavorite(courseIdStr);
                     },
                     icon: Icon(isFav ? Icons.favorite : Icons.favorite_border),
                     label: Text(
-                        isFav ? 'Tersimpan di Favorit' : 'Tambah ke Favorit'),
+                      isFav ? 'Tersimpan di Favorit' : 'Tambah ke Favorit',
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: isFav
                           ? Colors.blue.shade200
@@ -138,7 +206,7 @@ class CourseDetailPage extends StatelessWidget {
                   label: const Text('Kembali'),
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),
