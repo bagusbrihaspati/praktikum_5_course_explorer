@@ -61,7 +61,6 @@ class CourseSupabaseService implements CourseDataSource {
 
 @override
   Future<void> deleteCourse(dynamic id) async {
-    // Instruksi 87: Eksekusi DELETE berdasarkan ID pada tabel courses
     await supabase
         .from('courses')
         .delete()
