@@ -1,47 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart'; // <-- Tambahkan baris ini
+
 import 'providers/course_provider.dart';
 import 'repositories/course_repository.dart';
+import 'services/course_api_service.dart';
 import 'screens/courses_page.dart';
 import 'screens/debugging_lab_page.dart';
 import 'screens/home_page.dart';
 import 'screens/profile_feedback_page.dart';
 import 'screens/favorites_page.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'models/course.dart';
-import 'services/course_api_service.dart';
 
 const String studentName = 'I Ketut Bagus Brihaspati';
 const String studentId = '2415051090';
 
-const String apiUrl = 'https://jsonplaceholder.typicode.com/posts';
-
-Future<List<Course>> fetchCourses() async {
-  final response = await http.get(Uri.parse(apiUrl));
-
-  if (response.statusCode == 200) {
-    final List<dynamic> data = jsonDecode(response.body);
-    return data.map((item) => Course.fromJson(item as Map<String, dynamic>)).toList();
-  }
-
-  throw Exception('HTTP ${response.statusCode}');
-}
+// Konfigurasi Supabase
+const String supabaseUrl = 'https://YOUR_PROJECT_ID.supabase.co';
+const String supabaseAnonKey = 'YOUR_ANON_KEY';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // URL API Latihan
-  const String apiBaseUrl = 'https://jsonplaceholder.typicode.com/posts';
+  // Inisialisasi Supabase Client (Tahap 10)
+  await Supabase.initialize(
+    url: supabaseUrl,
+    anonKey: supabaseAnonKey,
+  );
 
-  // Rakit Service -> Repository -> Provider (Instruksi 55)
-  final dataSource = CourseApiService(apiBaseUrl);
+  final dataSource = CourseApiService('https://jsonplaceholder.typicode.com/posts');
   final repository = CourseRepository(dataSource);
 
   runApp(
     ChangeNotifierProvider(
       create: (_) => CourseProvider(repository)..loadCourses(),
-      child: const CourseExplorerApp(),
+      child: const CourseExplorerApp(), // Atau widget utama aplikasi Anda
     ),
   );
 }
