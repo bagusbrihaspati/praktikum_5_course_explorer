@@ -31,13 +31,16 @@ Future<List<Course>> fetchCourses() async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final courseApiService =
-      CourseApiService('https://jsonplaceholder.typicode.com/posts');
-  final courseRepository = CourseRepository(courseApiService);
+  // URL API Latihan
+  const String apiBaseUrl = 'https://jsonplaceholder.typicode.com/posts';
+
+  // Rakit Service -> Repository -> Provider (Instruksi 55)
+  final dataSource = CourseApiService(apiBaseUrl);
+  final repository = CourseRepository(dataSource);
 
   runApp(
     ChangeNotifierProvider(
-      create: (_) => CourseProvider(courseRepository)..loadCourses(),
+      create: (_) => CourseProvider(repository)..loadCourses(),
       child: const CourseExplorerApp(),
     ),
   );

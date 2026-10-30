@@ -1,27 +1,22 @@
 import '../models/course.dart';
-import '../services/course_api_service.dart';
+import '../services/course_data_source.dart';
 
 const String studentName = 'I Ketut Bagus Brihaspati';
 const String studentId = '2415051090';
 
 class CourseRepository {
-  final CourseApiService _apiService;
+  final CourseDataSource dataSource;
 
-  CourseRepository(this._apiService);
+  CourseRepository(this.dataSource);
 
-  Future<List<Course>> getCourses() async {
-    return await _apiService.getCourses();
-  }
-  
-  Future<Course> createCourse(Course course) async {
-    return await _apiService.createCourse(course);
-  }
+  Future<List<Course>> getCourses() => dataSource.getCourses();
 
-  Future<void> updateCourse(dynamic id, Course course) async {
-    await _apiService.updateCourse(id, course);
-  }
+  Future<Course> createCourse(Course course) =>
+      dataSource.createCourse(course);
 
-  Future<void> deleteCourse(dynamic id) async {
-    await _apiService.deleteCourse(id);
-  }
+  Future<void> updateCourse(dynamic id, Course course) =>
+      dataSource.updateCourse(id, course);
+
+  Future<void> deleteCourse(dynamic id) =>
+      dataSource.deleteCourse(id);
 }

@@ -41,12 +41,10 @@ class CourseDetailPage extends StatelessWidget {
             },
           ),
 
-          // 2. Tombol Delete Course (Instruksi No. 46, 47, 48, 49, 50, 51)
           IconButton(
             icon: const Icon(Icons.delete, color: Colors.red),
             tooltip: 'Hapus Course',
             onPressed: () async {
-              // Instruksi 47: Tampilkan AlertDialog konfirmasi sebelum menghapus
               final confirm = await showDialog<bool>(
                 context: context,
                 builder: (ctx) => AlertDialog(

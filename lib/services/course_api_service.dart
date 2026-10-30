@@ -1,19 +1,21 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/course.dart';
+import 'course_data_source.dart';
 
 const String studentName = 'I Ketut Bagus Brihaspati';
 const String studentId = '2415051090';
 
-class CourseApiService {
+class CourseApiService implements CourseDataSource {
   final String baseUrl;
 
   CourseApiService(this.baseUrl);
 
+  @override
   Future<List<Course>> getCourses() async {
     final url = baseUrl.endsWith('/posts') || baseUrl.endsWith('/courses')
-    ? baseUrl
-    : '$baseUrl/courses';
+        ? baseUrl
+        : '$baseUrl/courses';
 
     final response = await http.get(Uri.parse(url));
 
@@ -27,6 +29,7 @@ class CourseApiService {
         .toList();
   }
 
+  @override
   Future<Course> createCourse(Course course) async {
     final url = baseUrl.endsWith('/posts') || baseUrl.endsWith('/courses')
         ? baseUrl
@@ -47,8 +50,8 @@ class CourseApiService {
     throw Exception('Gagal membuat course: HTTP ${response.statusCode}');
   }
 
+  @override
   Future<void> updateCourse(dynamic id, Course course) async {
-    // Endpoint REST API PUT: sesuaikan dengan struktur URL (misal: /posts/1 atau /courses/1)
     final root = baseUrl.endsWith('/posts') || baseUrl.endsWith('/courses')
         ? baseUrl
         : '$baseUrl/courses';
@@ -65,6 +68,7 @@ class CourseApiService {
     }
   }
 
+  @override
   Future<void> deleteCourse(dynamic id) async {
     final root = baseUrl.endsWith('/posts') || baseUrl.endsWith('/courses')
         ? baseUrl
