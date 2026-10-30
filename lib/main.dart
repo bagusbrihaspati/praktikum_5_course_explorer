@@ -4,36 +4,36 @@ import 'package:supabase_flutter/supabase_flutter.dart'; // <-- Tambahkan baris 
 
 import 'providers/course_provider.dart';
 import 'repositories/course_repository.dart';
-import 'services/course_api_service.dart';
 import 'screens/courses_page.dart';
 import 'screens/debugging_lab_page.dart';
 import 'screens/home_page.dart';
 import 'screens/profile_feedback_page.dart';
 import 'screens/favorites_page.dart';
+import 'services/course_supabase_service.dart';
 
 const String studentName = 'I Ketut Bagus Brihaspati';
 const String studentId = '2415051090';
 
 // Konfigurasi Supabase
-const String supabaseUrl = 'https://YOUR_PROJECT_ID.supabase.co';
-const String supabaseAnonKey = 'YOUR_ANON_KEY';
+const String supabaseUrl = 'https://znrjokqbhjmyfafrsqpa.supabase.co';
+const String supabaseAnonKey = 'sb_publishable_IyadaeSzSGBRKgmcf8YdBg_jSozk9Yj';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Inisialisasi Supabase Client (Tahap 10)
   await Supabase.initialize(
     url: supabaseUrl,
     anonKey: supabaseAnonKey,
   );
 
-  final dataSource = CourseApiService('https://jsonplaceholder.typicode.com/posts');
+  // Ganti sumber data ke Supabase:
+  final dataSource = CourseSupabaseService();
   final repository = CourseRepository(dataSource);
 
   runApp(
     ChangeNotifierProvider(
       create: (_) => CourseProvider(repository)..loadCourses(),
-      child: const CourseExplorerApp(), // Atau widget utama aplikasi Anda
+      child: const CourseExplorerApp(),
     ),
   );
 }
