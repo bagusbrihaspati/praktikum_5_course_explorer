@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "45524748974",
+    "project_id": "kosfinder-praktikum",
+    "storage_bucket": "kosfinder-praktikum.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:45524748974:android:1f33a4819b16c0cfc57b3f",
+        "android_client_info": {
+          "package_name": "com.example.praktikum_5_course_explorer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGgljKnNKR-wIZXTfGc6TYyPs8BaW_bdI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,8 +1,10 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'app_keys.dart';
+import 'firebase_options.dart';
 import 'pages/home_page.dart';
 import 'pages/login_page.dart';
 import 'providers/course_provider.dart';
@@ -17,10 +19,14 @@ const String studentId = '2415051090';
 const String supabaseUrl = 'https://znrjokqbhjmyfafrsqpa.supabase.co';
 const String supabaseAnonKey = 'sb_publishable_IyadaeSzSGBRKgmcf8YdBg_jSozk9Yj';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-await Supabase.initialize(
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  await Supabase.initialize(
     url: supabaseUrl,
     publishableKey: supabaseAnonKey,
   );
