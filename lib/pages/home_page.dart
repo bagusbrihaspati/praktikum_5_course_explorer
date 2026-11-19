@@ -1,3 +1,4 @@
+import '../services/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../services/auth_service.dart';
@@ -16,10 +17,11 @@ class _HomePageState extends State<HomePage> {
   late final Future<UserProfile?> _profileFuture;
   final _kosService = KosService();
 
-  @override
+@override
   void initState() {
     super.initState();
     _profileFuture = ProfileService().getMyProfile();
+    NotificationService.instance.init();
   }
 
   Future<void> _logout() async {
@@ -29,6 +31,17 @@ class _HomePageState extends State<HomePage> {
       MaterialPageRoute(builder: (_) => const LoginPage()),
       (route) => false,
     );
+  }
+
+  Future<void> _initNotifications() async {
+    await NotificationService.instance.requestPermission();
+    final token = await NotificationService.instance.getToken();
+    if (token != null) {
+      await NotificationService.instance.saveTokenToSupabase(token);
+    }
+    NotificationService.instance.listenTokenRefresh((newToken) {
+      NotificationService.instance.saveTokenToSupabase(newToken);
+    });
   }
 
   Future<void> _showAddOrEditDialog({Map? existing}) async {
